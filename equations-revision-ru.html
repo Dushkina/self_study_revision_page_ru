@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Решение линейных уравнений</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- KaTeX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '\\(', right: '\\)', display: false}
+    ]
+  });"></script>
+
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg:        #f7f4f0;
+  --card:      #ffffff;
+  --pink:      #e84fa3;
+  --purple:    #7c5cbf;
+  --pink-lt:   #fde8f4;
+  --pink-mid:  #f9c9e8;
+  --purple-lt: #ede8f8;
+  --ink:       #1a1228;
+  --muted:     #7a6e82;
+  --border:    #e5dff0;
+  --radius:    20px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  padding: 48px 24px 80px;
+}
+
+.page { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+
+/* ── DIVIDER ── */
+.divider {
+  height: 2px;
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  opacity: 0.25;
+  border-radius: 2px;
+  margin: 4px 0;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--ink);
+  border-radius: var(--radius);
+  padding: 52px 44px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+}
+.hero-blob-1 { width: 300px; height: 300px; background: rgba(232,79,163,0.28); top: -80px; right: -60px; }
+.hero-blob-2 { width: 240px; height: 240px; background: rgba(124,92,191,0.22); bottom: -60px; left: 40px; }
+
+.hero-badge {
+  position: absolute;
+  top: 24px; right: 24px;
+  background: var(--pink);
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 99px;
+}
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  color: #fff;
+  line-height: 1.12;
+  margin-bottom: 16px;
+  position: relative;
+}
+.hero-sub {
+  color: rgba(255,255,255,0.55);
+  font-size: 0.95rem;
+  max-width: 500px;
+  position: relative;
+}
+
+/* ── SECTION LABEL ── */
+.sec-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.sec-label::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 3px;
+  background: var(--pink);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+}
+
+h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.7rem;
+  color: var(--ink);
+  margin-bottom: 20px;
+  line-height: 1.25;
+}
+h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+p { color: var(--muted); font-size: 0.94rem; }
+p strong { color: var(--ink); }
+
+/* ── KEY RULE ── */
+.key-rule {
+  background: linear-gradient(135deg, var(--pink-lt), var(--purple-lt));
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px 30px;
+}
+.key-rule-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 10px;
+}
+.key-rule p { color: var(--ink); font-size: 0.96rem; }
+.key-rule .hl { color: var(--pink); font-weight: 700; }
+.key-rule .hl-purple { color: var(--purple); font-weight: 700; }
+
+/* ── OPS GRID ── */
+.ops-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.op-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+.op-icon { font-size: 1.4rem; margin-bottom: 8px; }
+.op-card strong {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.op-card span { font-size: 0.82rem; color: var(--muted); }
+
+/* ── SIGN VISUAL ── */
+.sign-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+.sv {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+.sv-l { background: var(--purple-lt); color: var(--purple); border: 1.5px solid #d4c8ef; }
+.sv-r { background: var(--pink-lt); color: var(--pink); border: 1.5px solid var(--pink-mid); }
+.sv-eq { color: var(--muted); font-size: 1.2rem; font-weight: 400; }
+
+/* ── ALGORITHM ── */
+.algo-list { display: flex; flex-direction: column; gap: 12px; }
+.algo-step {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 22px;
+  transition: border-color 0.2s;
+}
+.algo-step:hover { border-color: var(--pink); }
+.algo-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--pink);
+  border-radius: 8px;
+  min-width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.algo-badge.purple { background: var(--purple); }
+.algo-body h4 { font-size: 0.95rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.algo-body p { font-size: 0.85rem; color: var(--muted); margin-bottom: 0; }
+.algo-note {
+  display: inline-block;
+  margin-top: 7px;
+  background: var(--pink-lt);
+  border: 1px solid var(--pink-mid);
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--pink);
+}
+.algo-note.purple {
+  background: var(--purple-lt);
+  border-color: #d4c8ef;
+  color: var(--purple);
+}
+
+/* ── WORKED EXAMPLES ── */
+.example-card {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.example-header {
+  background: linear-gradient(135deg, #1e0e35, #3a1f6e);
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.example-header-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+.example-eq-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: rgba(232,79,163,0.22);
+  border: 1px solid rgba(232,79,163,0.4);
+  color: #f9a8d4;
+  padding: 6px 16px;
+  border-radius: 99px;
+}
+.example-body { background: var(--card); padding: 0; }
+
+.step-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 12px 28px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.step-row:last-child { border-bottom: none; }
+.step-row:hover { background: var(--bg); }
+.step-n {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  min-width: 22px;
+  flex-shrink: 0;
+}
+.step-formula {
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+.step-formula .katex { font-size: 0.95rem; }
+.step-formula .katex-display { display: inline; }
+.step-comment {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-style: italic;
+  flex-shrink: 0;
+  max-width: 240px;
+  text-align: right;
+}
+.answer-row {
+  background: var(--pink-lt);
+  border-top: 1.5px solid var(--pink-mid) !important;
+  padding: 14px 28px !important;
+}
+.answer-row .step-formula { color: var(--pink); font-weight: 700; }
+.answer-row .step-comment { color: var(--pink); }
+
+/* ── TABLE ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+}
+thead tr { background: var(--purple-lt); }
+thead th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--purple);
+  padding: 12px 16px;
+  text-align: left;
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f5f0fc; }
+tbody td {
+  padding: 11px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+tbody td.desc { font-family: 'Space Grotesk', sans-serif; color: var(--muted); font-size: 0.87rem; }
+tbody td.hl { background: var(--pink-lt); color: var(--pink); font-weight: 600; }
+
+/* ── FORMULA DISPLAY ── */
+.formula-display {
+  background: rgba(255,255,255,0.7);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 22px;
+  margin: 14px 0;
+  text-align: center;
+  overflow-x: auto;
+}
+.formula-display .katex { font-size: 1.15rem; }
+
+/* ── HW ── */
+.hw-group-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 22px 0 10px;
+  padding-left: 2px;
+}
+.hw-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.hw-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.hw-item:hover { border-color: var(--pink); }
+.hw-item.done { background: var(--pink-lt); border-color: var(--pink-mid); }
+.hw-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  min-width: 20px;
+  flex-shrink: 0;
+}
+.hw-eq {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--ink);
+  flex: 1;
+  line-height: 1.3;
+}
+.hw-item.done .hw-eq { color: var(--pink); }
+.diff-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+.pill-easy { background: #d1fae5; color: #059669; border: 1px solid #a7f3d0; }
+.pill-med  { background: #fef9c3; color: #b45309; border: 1px solid #fde68a; }
+.pill-hard { background: var(--pink-lt); color: var(--pink); border: 1px solid var(--pink-mid); }
+.hw-check {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  color: transparent;
+}
+.hw-item.done .hw-check {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: #fff;
+}
+
+/* ── PROGRESS ── */
+.progress-wrap {
+  background: var(--purple-lt);
+  border-radius: 99px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.progress-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  padding-top: 12px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  body { padding: 24px 16px 60px; }
+  .hero { padding: 36px 24px 32px; }
+  .card { padding: 22px 20px; }
+  .ops-grid, .hw-grid { grid-template-columns: 1fr; }
+  .step-comment { display: none; }
+  .example-header { flex-direction: column; align-items: flex-start; }
+  .sign-row { gap: 6px; }
+  .sv { font-size: 0.85rem; padding: 8px 14px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-badge">Алгебра · 8 класс</div>
+  <div class="hero-eyebrow">Страница для самостоятельного повторения</div>
+  <h1>Решение линейных<br>уравнений</h1>
+  <p class="hero-sub">Главный принцип: при переносе любого элемента через знак равенства его знак меняется на противоположный — будь то число или переменная.</p>
+</div>
+
+<!-- ═══ ПОНЯТИЕ БАЛАНСА ═══ -->
+<div>
+  <div class="sec-label">Основная идея</div>
+  <div class="card">
+    <h2>Принцип равновесия</h2>
+    <p>Уравнение — это весы. <strong>Левая часть (ЛЧ)</strong> всегда должна быть равна <strong>правой части (ПЧ)</strong>. Любое действие, выполненное с одной стороной, необходимо выполнить и с другой.</p>
+
+    <div class="formula-display">
+      \( \text{ЛЧ} = \text{ПЧ} \quad \Rightarrow \quad \text{ЛЧ} \pm k = \text{ПЧ} \pm k \)
+    </div>
+
+    <div class="ops-grid" style="margin-top: 4px;">
+      <div class="op-card">
+        <div class="op-icon">➕</div>
+        <strong>Прибавить одинаковое число</strong>
+        <span>к обеим частям — баланс сохраняется</span>
+      </div>
+      <div class="op-card">
+        <div class="op-icon">➖</div>
+        <strong>Вычесть одинаковое число</strong>
+        <span>из обеих частей — баланс сохраняется</span>
+      </div>
+      <div class="op-card">
+        <div class="op-icon">✖️</div>
+        <strong>Умножить обе части</strong>
+        <span>на одинаковое число — баланс сохраняется</span>
+      </div>
+      <div class="op-card">
+        <div class="op-icon">➗</div>
+        <strong>Разделить обе части</strong>
+        <span>на одинаковое число — баланс сохраняется</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ ЗОЛОТОЕ ПРАВИЛО ═══ -->
+<div>
+  <div class="sec-label">Ключевое правило</div>
+  <div class="key-rule">
+    <div class="key-rule-title">⚡ Правило переноса (смена знака)</div>
+    <p>Когда мы <span class="hl">переносим любой элемент через знак равенства</span> — будь то <span class="hl">число</span> или <span class="hl-purple">переменная</span>, перенос вправо или влево — мы <span class="hl">обязательно меняем его знак на противоположный</span>.</p>
+    <div style="margin-top: 16px; display: flex; gap: 24px; flex-wrap: wrap;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--pink);">+ 5</span>
+        <span style="color:var(--muted);">→ переходит через = →</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--purple);">− 5</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--pink);">− 3x</span>
+        <span style="color:var(--muted);">→ переходит через = →</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--purple);">+ 3x</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Наглядная схема -->
+  <div class="card" style="margin-top: 14px;">
+    <p style="font-size:0.82rem; color:var(--muted); font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px;">Наглядный пример</p>
+
+    <div class="sign-row">
+      <div class="sv sv-l">\(2x + 5\)</div>
+      <span class="sv-eq">=</span>
+      <div class="sv sv-r">\(11\)</div>
+    </div>
+    <p style="text-align:center; font-size:0.83rem; margin: 4px 0;">Переносим <strong style="color:var(--pink);">+5</strong> вправо → становится <strong style="color:var(--purple);">−5</strong></p>
+    <div class="sign-row">
+      <div class="sv sv-l">\(2x\)</div>
+      <span class="sv-eq">=</span>
+      <div class="sv sv-r">\(11 - 5\)</div>
+    </div>
+    <p style="text-align:center; font-size:0.83rem; margin: 4px 0;">Делим обе части на <strong style="color:var(--pink);">2</strong></p>
+    <div class="sign-row">
+      <div class="sv sv-l">\(x\)</div>
+      <span class="sv-eq">=</span>
+      <div class="sv sv-r">\(3\)</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ АЛГОРИТМ ═══ -->
+<div>
+  <div class="sec-label">Алгоритм решения</div>
+  <div class="card">
+    <h2>Пошаговый метод</h2>
+    <div class="algo-list">
+
+      <div class="algo-step">
+        <div class="algo-badge">01</div>
+        <div class="algo-body">
+          <h4>Раскрыть все скобки</h4>
+          <p>Используй закон распределения — умножь каждый элемент в скобках на то, что стоит перед ними.</p>
+          <span class="algo-note">\(a(b+c) = ab + ac\)</span>
+        </div>
+      </div>
+
+      <div class="algo-step">
+        <div class="algo-badge">02</div>
+        <div class="algo-body">
+          <h4>Перенести все элементы с переменной ВЛЕВО</h4>
+          <p>Перенеси все слагаемые, содержащие x, в левую часть. При переходе через = — <strong>меняй знак на противоположный</strong>.</p>
+          <span class="algo-note">+3x справа → −3x слева</span>
+        </div>
+      </div>
+
+      <div class="algo-step">
+        <div class="algo-badge purple">03</div>
+        <div class="algo-body">
+          <h4>Перенести все числа ВПРАВО</h4>
+          <p>Перенеси все числа (без x) в правую часть. При переходе через = — <strong>меняй знак на противоположный</strong>.</p>
+          <span class="algo-note purple">+7 слева → −7 справа</span>
+        </div>
+      </div>
+
+      <div class="algo-step">
+        <div class="algo-badge purple">04</div>
+        <div class="algo-body">
+          <h4>Привести подобные слагаемые</h4>
+          <p>Сложи все x-слагаемые слева, сложи все числа справа.</p>
+        </div>
+      </div>
+
+      <div class="algo-step">
+        <div class="algo-badge">05</div>
+        <div class="algo-body">
+          <h4>Найти x — разделить обе части</h4>
+          <p>Раздели обе части на коэффициент при x, чтобы найти решение.</p>
+          <span class="algo-note">\(4x = 20 \Rightarrow x = 5\)</span>
+        </div>
+      </div>
+
+      <div class="algo-step">
+        <div class="algo-badge purple">06</div>
+        <div class="algo-body">
+          <h4>Проверить ответ</h4>
+          <p>Подставь найденное x в исходное уравнение — обе части должны быть равны.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Таблица-шпаргалка -->
+<div class="card">
+  <div class="sec-label">Краткая справка</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Ситуация</th>
+        <th>Что делать</th>
+        <th>Правило знака</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>\(+k\) в левой части</td>
+        <td class="desc">Перенести вправо</td>
+        <td class="hl">становится −k</td>
+      </tr>
+      <tr>
+        <td>\(-k\) в левой части</td>
+        <td class="desc">Перенести вправо</td>
+        <td class="hl">становится +k</td>
+      </tr>
+      <tr>
+        <td>\(+bx\) в правой части</td>
+        <td class="desc">Перенести влево</td>
+        <td class="hl">становится −bx</td>
+      </tr>
+      <tr>
+        <td>\(-bx\) в правой части</td>
+        <td class="desc">Перенести влево</td>
+        <td class="hl">становится +bx</td>
+      </tr>
+      <tr>
+        <td>Дробь \(\dfrac{ax+b}{c} = k\)</td>
+        <td class="desc">Сначала умножить обе части на c</td>
+        <td>знак не меняется</td>
+      </tr>
+      <tr>
+        <td>Скобки \(a(bx+c)\)</td>
+        <td class="desc">Сначала раскрыть скобки</td>
+        <td>знак пока не меняется</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ РАЗОБРАННЫЕ ПРИМЕРЫ ═══ -->
+<div>
+  <div class="sec-label">Разобранные примеры</div>
+
+  <!-- Пример 1 -->
+  <div class="example-card" style="margin-bottom:14px;">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 1 · Базовый — переменные с обеих сторон</div></div>
+      <div class="example-eq-badge">2x − 1 = 5 + x</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row">
+        <span class="step-n">①</span>
+        <span class="step-formula">\(2x - 1 = 5 + x\)</span>
+        <span class="step-comment">исходное уравнение</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">②</span>
+        <span class="step-formula">\(2x - x = 5 + 1\)</span>
+        <span class="step-comment">x переносим влево; −1 вправо → +1</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">③</span>
+        <span class="step-formula">\(x = 6\)</span>
+        <span class="step-comment">приводим подобные</span>
+      </div>
+      <div class="step-row answer-row">
+        <span class="step-n">✓</span>
+        <span class="step-formula">x = 6</span>
+        <span class="step-comment">Проверка: 2(6)−1 = 11 = 5+6 ✔</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Пример 2 -->
+  <div class="example-card" style="margin-bottom:14px;">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 2 · Скобки с обеих сторон</div></div>
+      <div class="example-eq-badge">3(x − 6) = 2(2 − x) + 3</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row">
+        <span class="step-n">①</span>
+        <span class="step-formula">\(3(x-6) = 2(2-x)+3\)</span>
+        <span class="step-comment">исходное уравнение</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">②</span>
+        <span class="step-formula">\(3x - 18 = 4 - 2x + 3\)</span>
+        <span class="step-comment">раскрываем скобки</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">③</span>
+        <span class="step-formula">\(3x + 2x = 4 + 3 + 18\)</span>
+        <span class="step-comment">−2x → +2x (влево); −18 → +18 (вправо)</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">④</span>
+        <span class="step-formula">\(5x = 25\)</span>
+        <span class="step-comment">приводим подобные</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">⑤</span>
+        <span class="step-formula">\(x = 25 \div 5\)</span>
+        <span class="step-comment">делим обе части на 5</span>
+      </div>
+      <div class="step-row answer-row">
+        <span class="step-n">✓</span>
+        <span class="step-formula">x = 5</span>
+        <span class="step-comment">Проверка: 3(−1)=−3 = 2(−3)+3 ✔</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Пример 3 -->
+  <div class="example-card" style="margin-bottom:14px;">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 3 · Уравнение с дробью</div></div>
+      <div class="example-eq-badge">(1 − 3x) / 2 = −4</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row">
+        <span class="step-n">①</span>
+        <span class="step-formula">\(\dfrac{1-3x}{2} = -4\)</span>
+        <span class="step-comment">исходное уравнение</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">②</span>
+        <span class="step-formula">\(1 - 3x = -4 \times 2\)</span>
+        <span class="step-comment">умножаем обе части на 2</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">③</span>
+        <span class="step-formula">\(1 - 3x = -8\)</span>
+        <span class="step-comment">упрощаем правую часть</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">④</span>
+        <span class="step-formula">\(-3x = -8 - 1\)</span>
+        <span class="step-comment">+1 переносим вправо → −1</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">⑤</span>
+        <span class="step-formula">\(-3x = -9\)</span>
+        <span class="step-comment">упрощаем</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">⑥</span>
+        <span class="step-formula">\(x = (-9) \div (-3)\)</span>
+        <span class="step-comment">делим обе части на −3</span>
+      </div>
+      <div class="step-row answer-row">
+        <span class="step-n">✓</span>
+        <span class="step-formula">x = 3</span>
+        <span class="step-comment">Проверка: (1−9)/2 = −4 ✔</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Пример 4 -->
+  <div class="example-card" style="margin-bottom:14px;">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 4 · Двойные скобки + приведение</div></div>
+      <div class="example-eq-badge">4(2x + 3) − 10 = 5(3 − x)</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row">
+        <span class="step-n">①</span>
+        <span class="step-formula">\(4(2x+3)-10=5(3-x)\)</span>
+        <span class="step-comment">исходное уравнение</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">②</span>
+        <span class="step-formula">\(8x + 12 - 10 = 15 - 5x\)</span>
+        <span class="step-comment">раскрываем обе скобки</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">③</span>
+        <span class="step-formula">\(8x + 2 = 15 - 5x\)</span>
+        <span class="step-comment">приводим в левой части</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">④</span>
+        <span class="step-formula">\(8x + 5x = 15 - 2\)</span>
+        <span class="step-comment">−5x → +5x (влево); +2 → −2 (вправо)</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">⑤</span>
+        <span class="step-formula">\(13x = 13\)</span>
+        <span class="step-comment">упрощаем</span>
+      </div>
+      <div class="step-row answer-row">
+        <span class="step-n">✓</span>
+        <span class="step-formula">x = 1</span>
+        <span class="step-comment">Проверка: 4(5)−10=10=5(2) ✔</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Пример 5 -->
+  <div class="example-card">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 5 · Отрицательный знаменатель</div></div>
+      <div class="example-eq-badge">(6 + 5x) / −2 = 7</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row">
+        <span class="step-n">①</span>
+        <span class="step-formula">\(\dfrac{6+5x}{-2} = 7\)</span>
+        <span class="step-comment">исходное уравнение</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">②</span>
+        <span class="step-formula">\(6 + 5x = 7 \times (-2)\)</span>
+        <span class="step-comment">умножаем обе части на −2</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">③</span>
+        <span class="step-formula">\(6 + 5x = -14\)</span>
+        <span class="step-comment">упрощаем правую часть</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">④</span>
+        <span class="step-formula">\(5x = -14 - 6\)</span>
+        <span class="step-comment">+6 переносим вправо → −6</span>
+      </div>
+      <div class="step-row">
+        <span class="step-n">⑤</span>
+        <span class="step-formula">\(5x = -20\)</span>
+        <span class="step-comment">упрощаем</span>
+      </div>
+      <div class="step-row answer-row">
+        <span class="step-n">✓</span>
+        <span class="step-formula">x = −4</span>
+        <span class="step-comment">Проверка: (6−20)/(−2) = 7 ✔</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ ДОМАШНЕЕ ЗАДАНИЕ ═══ -->
+<div>
+  <div class="sec-label">Домашнее задание</div>
+  <div class="card">
+    <h2>20 уравнений для практики</h2>
+    <p style="margin-bottom:18px;">Нажми на уравнение, чтобы отметить как выполненное. Работай по уровням — не перепрыгивай!</p>
+
+    <div class="progress-wrap">
+      <div class="progress-fill" id="pBar"></div>
+    </div>
+    <div class="progress-text" id="pLabel">0 / 20 выполнено</div>
+
+    <!-- Уровень 1 -->
+    <div class="hw-group-label">🟢 Уровень 1 — Базовые уравнения</div>
+    <div class="hw-grid">
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">01</span>
+        <span class="hw-eq">3x + 4 = 19</span>
+        <span class="diff-pill pill-easy">легко</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">02</span>
+        <span class="hw-eq">5x − 3 = 22</span>
+        <span class="diff-pill pill-easy">легко</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">03</span>
+        <span class="hw-eq">2x + 7 = −3</span>
+        <span class="diff-pill pill-easy">легко</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">04</span>
+        <span class="hw-eq">−4x + 1 = 13</span>
+        <span class="diff-pill pill-easy">легко</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">05</span>
+        <span class="hw-eq">x/3 + 2 = 7</span>
+        <span class="diff-pill pill-easy">легко</span>
+        <div class="hw-check">✓</div>
+      </div>
+    </div>
+
+    <!-- Уровень 2 -->
+    <div class="hw-group-label">🟡 Уровень 2 — Переменные с обеих сторон</div>
+    <div class="hw-grid">
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">06</span>
+        <span class="hw-eq">4x − 5 = 2x + 1</span>
+        <span class="diff-pill pill-med">средне</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">07</span>
+        <span class="hw-eq">7 + 7x = 3x + 23</span>
+        <span class="diff-pill pill-med">средне</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">08</span>
+        <span class="hw-eq">2x + 5 = 10 − 3x</span>
+        <span class="diff-pill pill-med">средне</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">09</span>
+        <span class="hw-eq">9 − 3x = −6x + 5</span>
+        <span class="diff-pill pill-med">средне</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">10</span>
+        <span class="hw-eq">−6 + x = 5x + 4</span>
+        <span class="diff-pill pill-med">средне</span>
+        <div class="hw-check">✓</div>
+      </div>
+    </div>
+
+    <!-- Уровень 3 -->
+    <div class="hw-group-label">🟠 Уровень 3 — Со скобками</div>
+    <div class="hw-grid">
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">11</span>
+        <span class="hw-eq">3(t − 2) = t + 4</span>
+        <span class="diff-pill pill-med">средне</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">12</span>
+        <span class="hw-eq">4(3y − 1) = 2y + 1</span>
+        <span class="diff-pill pill-med">средне</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">13</span>
+        <span class="hw-eq">8(p + 2) = 1 + 3p</span>
+        <span class="diff-pill pill-med">средне</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">14</span>
+        <span class="hw-eq">x − 2 = 2(x − 4)</span>
+        <span class="diff-pill pill-med">средне</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">15</span>
+        <span class="hw-eq">6(2x − 3) = x − 7</span>
+        <span class="diff-pill pill-med">средне</span>
+        <div class="hw-check">✓</div>
+      </div>
+    </div>
+
+    <!-- Уровень 4 -->
+    <div class="hw-group-label">🔴 Уровень 4 — Дроби и сложные уравнения</div>
+    <div class="hw-grid">
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">16</span>
+        <span class="hw-eq">(4x − 1)/5 = 7</span>
+        <span class="diff-pill pill-hard">сложно</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">17</span>
+        <span class="hw-eq">(3x + 1)/4 = −5</span>
+        <span class="diff-pill pill-hard">сложно</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">18</span>
+        <span class="hw-eq">2(x − 8) = 3(x − 5)</span>
+        <span class="diff-pill pill-hard">сложно</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">19</span>
+        <span class="hw-eq">5(1−2x)+3(x+5)=2(1+x)−9</span>
+        <span class="diff-pill pill-hard">сложно</span>
+        <div class="hw-check">✓</div>
+      </div>
+      <div class="hw-item" onclick="toggle(this)">
+        <span class="hw-num">20</span>
+        <span class="hw-eq">3(x−1)−4(5+x)=4(2x+1)</span>
+        <span class="diff-pill pill-hard">сложно</span>
+        <div class="hw-check">✓</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>Алгебра · Линейные уравнения · Самостоятельное повторение</footer>
+
+</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('done');
+  const total = document.querySelectorAll('.hw-item').length;
+  const done  = document.querySelectorAll('.hw-item.done').length;
+  const pct   = Math.round(done / total * 100);
+  document.getElementById('pBar').style.width   = pct + '%';
+  document.getElementById('pLabel').textContent = done + ' / ' + total + ' выполнено';
+}
+</script>
+</body>
+</html>
