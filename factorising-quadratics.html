@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factorising Quadratics · Разложение квадратных трёхчленов</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{
+    delimiters:[
+      {left:'$$',right:'$$',display:true},
+      {left:'\\(',right:'\\)',display:false}
+    ]
+  });">
+</script>
+
+<style>
+:root {
+  --bg:        #f7f4f0;
+  --card:      #ffffff;
+  --pink:      #e84fa3;
+  --purple:    #7c5cbf;
+  --pink-lt:   #fde8f4;
+  --pink-mid:  #f9c9e8;
+  --purple-lt: #ede8f8;
+  --ink:       #1a1228;
+  --muted:     #7a6e82;
+  --border:    #e5dff0;
+  --radius:    20px;
+  --green:     #059669;
+  --green-lt:  #d1fae5;
+  --green-bd:  #a7f3d0;
+  --amber:     #b45309;
+  --amber-lt:  #fef3c7;
+  --amber-bd:  #fde68a;
+  --red:       #dc2626;
+  --red-lt:    #fee2e2;
+  --red-bd:    #fca5a5;
+  --blue:      #0369a1;
+  --blue-lt:   #e0f2fe;
+  --blue-bd:   #bae6fd;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);font-family:'Space Grotesk',sans-serif;font-size:16px;line-height:1.7;padding:48px 24px 80px;}
+.page{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:28px;}
+
+/* DIVIDER */
+.divider{height:2px;background:linear-gradient(90deg,var(--pink),var(--purple));opacity:.25;border-radius:2px;}
+
+/* HERO */
+.hero{background:var(--ink);border-radius:var(--radius);padding:52px 44px 48px;position:relative;overflow:hidden;}
+.hero-blob{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;}
+.hero-blob-1{width:320px;height:320px;background:rgba(232,79,163,.28);top:-80px;right:-60px;}
+.hero-blob-2{width:240px;height:240px;background:rgba(124,92,191,.22);bottom:-60px;left:40px;}
+.hero-blob-3{width:160px;height:160px;background:rgba(5,150,105,.15);top:20px;left:220px;}
+.hero-badge{position:absolute;top:24px;right:24px;background:var(--pink);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:5px 14px;border-radius:99px;}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink);margin-bottom:14px;}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4.6vw,3.1rem);color:#fff;line-height:1.12;margin-bottom:16px;}
+.hero-sub{color:rgba(255,255,255,.55);font-size:.95rem;max-width:540px;}
+.hero-formula{margin-top:22px;background:rgba(255,255,255,.07);border:1px solid rgba(232,79,163,.35);border-radius:14px;padding:16px 22px;text-align:center;}
+.hero-formula-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(232,79,163,.8);margin-bottom:10px;}
+.hero-formula .katex{font-size:1.2rem;color:#fff;}
+
+/* SEC LABEL */
+.sec-label{display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;}
+.sec-label::before{content:'';display:block;width:24px;height:3px;background:var(--pink);border-radius:2px;flex-shrink:0;}
+
+/* CARD */
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:28px 32px;}
+h2{font-family:'DM Serif Display',serif;font-size:1.55rem;color:var(--ink);margin-bottom:18px;line-height:1.25;}
+p{color:var(--muted);font-size:.93rem;}
+p strong{color:var(--ink);}
+
+/* PILL */
+.pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px;}
+.pill-pink  {background:var(--pink-lt);color:var(--pink);border:1px solid var(--pink-mid);}
+.pill-purple{background:var(--purple-lt);color:var(--purple);border:1px solid #d4c8ef;}
+.pill-green {background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);}
+.pill-amber {background:var(--amber-lt);color:var(--amber);border:1px solid var(--amber-bd);}
+.pill-blue  {background:var(--blue-lt);color:var(--blue);border:1px solid var(--blue-bd);}
+
+/* KEY RULE */
+.key-rule{background:linear-gradient(135deg,var(--pink-lt),var(--purple-lt));border:1.5px solid var(--border);border-radius:var(--radius);padding:24px 28px;}
+.key-rule-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--pink);margin-bottom:10px;}
+.key-rule p{color:var(--ink);font-size:.95rem;}
+.key-rule .hl{color:var(--pink);font-weight:700;}
+.key-rule .hlp{color:var(--purple);font-weight:700;}
+
+/* ID CARD */
+.id-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:12px;}
+.id-card:last-child{margin-bottom:0;}
+.id-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap;}
+.id-title{font-weight:600;font-size:.95rem;color:var(--ink);}
+.id-formula-row{font-family:'JetBrains Mono',monospace;font-size:.9rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 14px;margin-top:6px;}
+.id-formula-row+.id-formula-row{margin-top:8px;}
+
+/* ALGO */
+.algo-list{display:flex;flex-direction:column;gap:10px;}
+.algo-step{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px 20px;transition:border-color .2s;}
+.algo-step:hover{border-color:var(--pink);}
+.algo-badge{font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:700;color:#fff;background:var(--pink);border-radius:8px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.algo-badge.purple{background:var(--purple);}
+.algo-badge.green{background:var(--green);}
+.algo-badge.amber{background:var(--amber);}
+.algo-body h4{font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:4px;}
+.algo-body p{font-size:.85rem;color:var(--muted);}
+.algo-note{display:inline-block;margin-top:6px;background:var(--pink-lt);border:1px solid var(--pink-mid);border-radius:8px;padding:4px 12px;font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--pink);}
+.algo-note.purple{background:var(--purple-lt);border-color:#d4c8ef;color:var(--purple);}
+.algo-note.green{background:var(--green-lt);border-color:var(--green-bd);color:var(--green);}
+
+/* EXAMPLES */
+.example-card{border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
+.example-card:last-child{margin-bottom:0;}
+.example-header{background:linear-gradient(135deg,#1e0e35,#3a1f6e);padding:18px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.example-header-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.example-eq-badge{font-family:'JetBrains Mono',monospace;font-size:.92rem;font-weight:600;background:rgba(232,79,163,.22);border:1px solid rgba(232,79,163,.4);color:#f9a8d4;padding:6px 16px;border-radius:99px;}
+.example-body{background:var(--card);}
+.step-row{display:flex;align-items:baseline;gap:14px;padding:11px 26px;border-bottom:1px solid var(--border);transition:background .15s;}
+.step-row:last-child{border-bottom:none;}
+.step-row:hover{background:var(--bg);}
+.step-n{font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--muted);min-width:20px;flex-shrink:0;}
+.step-formula{flex:1;font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--ink);}
+.step-formula .katex{font-size:.91rem;}
+.step-comment{font-size:.76rem;color:var(--muted);font-style:italic;flex-shrink:0;max-width:240px;text-align:right;}
+.answer-row{background:var(--pink-lt)!important;border-top:1.5px solid var(--pink-mid)!important;}
+.answer-row .step-formula{color:var(--pink);font-weight:700;}
+.answer-row .step-comment{color:var(--pink);}
+
+/* TWO-COL COMPARE */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.compare-col{border-radius:14px;overflow:hidden;border:1.5px solid var(--border);}
+.compare-head{padding:12px 18px;font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:#fff;}
+.ch-pink{background:var(--pink);}
+.ch-green{background:var(--green);}
+.compare-body{background:var(--card);padding:16px 18px;}
+.compare-body p{font-size:.86rem;color:var(--muted);margin-bottom:6px;}
+.compare-body p:last-child{margin-bottom:0;}
+.compare-body strong{color:var(--ink);}
+.compare-formula{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin:8px 0;text-align:center;font-size:.88rem;}
+
+/* HW */
+.hw-group-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:22px 0 10px;padding-left:2px;}
+.hw-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.hw-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:border-color .2s,background .2s;-webkit-user-select:none;user-select:none;}
+.hw-item:hover{border-color:var(--pink);}
+.hw-item.done{background:var(--pink-lt);border-color:var(--pink-mid);}
+.hw-num{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);min-width:18px;flex-shrink:0;}
+.hw-eq{font-family:'JetBrains Mono',monospace;font-size:.84rem;color:var(--ink);flex:1;line-height:1.3;}
+.hw-item.done .hw-eq{color:var(--pink);}
+.hw-lv{font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;padding:2px 8px;border-radius:99px;flex-shrink:0;}
+.lv1{background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);}
+.lv2{background:var(--pink-lt);color:var(--pink);border:1px solid var(--pink-mid);}
+.hw-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:all .2s;color:transparent;flex-shrink:0;}
+.hw-item.done .hw-check{background:var(--pink);border-color:var(--pink);color:#fff;}
+
+/* PROGRESS */
+.progress-wrap{background:var(--purple-lt);border-radius:99px;height:8px;overflow:hidden;margin-bottom:8px;}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width .4s;width:0%;}
+.progress-text{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);margin-bottom:4px;}
+
+/* QUIZ */
+.quiz-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:12px;}
+.quiz-q{font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.4;}
+.quiz-opts{display:flex;gap:8px;flex-wrap:wrap;}
+.quiz-opt{padding:8px 16px;border-radius:99px;border:1.5px solid var(--border);background:var(--bg);font-family:'JetBrains Mono',monospace;font-size:.84rem;font-weight:600;color:var(--ink);cursor:pointer;transition:all .15s;-webkit-user-select:none;user-select:none;}
+.quiz-opt:hover:not(:disabled){border-color:var(--pink);background:var(--pink-lt);color:var(--pink);}
+.quiz-opt.correct{background:var(--green-lt);border-color:var(--green);color:var(--green);}
+.quiz-opt.wrong{background:var(--red-lt);border-color:var(--red);color:var(--red);}
+.quiz-opt.reveal{background:var(--green-lt);border-color:var(--green);color:var(--green);border-style:dashed;}
+.quiz-opt:disabled{cursor:default;}
+.quiz-fb{font-family:'JetBrains Mono',monospace;font-size:.76rem;border-radius:8px;padding:6px 12px;margin-top:8px;display:none;}
+.quiz-fb.show{display:block;}
+.quiz-fb.ok{background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);}
+.quiz-fb.err{background:var(--red-lt);color:var(--red);border:1px solid var(--red-bd);}
+
+.progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.score-badge{font-family:'JetBrains Mono',monospace;font-size:.78rem;padding:4px 14px;border-radius:99px;background:var(--purple-lt);color:var(--purple);border:1px solid #d4c8ef;font-weight:700;}
+.restart-btn{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:99px;padding:10px 24px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;margin-top:12px;transition:opacity .2s;display:none;}
+.restart-btn:hover{opacity:.85;}
+
+footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);padding-top:12px;}
+
+@media(max-width:640px){
+  body{padding:24px 16px 60px;}
+  .hero{padding:36px 22px 32px;}
+  .card{padding:22px 18px;}
+  .compare-grid,.hw-grid{grid-template-columns:1fr;}
+  .step-comment{display:none;}
+  .example-header{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ══ HERO ══ -->
+<div class="hero">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+  <div class="hero-badge">Algebra · Алгебра</div>
+  <div class="hero-eyebrow">Self-Study Revision · Самостоятельное повторение</div>
+  <h1>Factorising<br>Quadratics</h1>
+  <p class="hero-sub">Разложение квадратного трёхчлена на множители — два метода: для \(a=1\) и для \(a\neq 1\). Полный разбор с примерами и практикой.</p>
+  <div class="hero-formula">
+    <div class="hero-formula-label">Общая форма · General form</div>
+    $$ax^2 + bx + c = (px + q)(rx + s)$$
+  </div>
+</div>
+
+<!-- ══ §1 ТЕОРИЯ ══ -->
+<div>
+  <div class="sec-label">§1 · Что такое факторизация · What is Factorising</div>
+  <div class="card">
+    <h2>Основная идея · The Big Idea</h2>
+    <p style="margin-bottom:14px;"><strong>Факторизация (factorising)</strong> — это обратная операция к раскрытию скобок (expanding). Мы представляем квадратный трёхчлен \(ax^2+bx+c\) в виде произведения двух скобок.</p>
+
+    <div class="id-card">
+      <div class="id-head"><div class="id-title">Проверка · Check your answer</div><span class="pill pill-green">expand back</span></div>
+      <p style="font-size:.88rem;">Чтобы проверить ответ, раскройте скобки обратно (expand) — должен получиться исходный трёхчлен.</p>
+      <div class="id-formula-row">\((x+3)(x+4) \xrightarrow{\text{expand}} x^2+7x+12 \checkmark\)</div>
+    </div>
+
+    <div class="compare-grid" style="margin-top:14px;">
+      <div class="compare-col">
+        <div class="compare-head ch-green">Случай 1 · Case 1: \(a = 1\)</div>
+        <div class="compare-body">
+          <p><strong>Простой метод</strong> — два числа</p>
+          <p>Найти два числа, которые в сумме дают <strong>b</strong>, а в произведении — <strong>c</strong></p>
+          <div class="compare-formula">\(x^2+bx+c\)</div>
+          <p style="color:var(--green);">✓ Быстро · Fast</p>
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-head ch-pink">Случай 2 · Case 2: \(a \neq 1\)</div>
+        <div class="compare-body">
+          <p><strong>Метод ac</strong> — разбиение среднего члена</p>
+          <p>Найти два числа, которые в сумме дают <strong>b</strong>, а в произведении — <strong>a·c</strong></p>
+          <div class="compare-formula">\(ax^2+bx+c\)</div>
+          <p style="color:var(--pink);">⚙ Требует ac-метода</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ §2 a=1 ══ -->
+<div>
+  <div class="sec-label">§2 · Коэффициент \(a = 1\) · When \(a = 1\)</div>
+  <div class="key-rule">
+    <div class="key-rule-title">⚡ Метод «двух чисел» · Two-numbers method</div>
+    <p>Для \(x^2+bx+c\) нужно найти <span class="hl">два числа p и q</span> такие, что:</p>
+    <p style="margin-top:8px;"><span class="hlp">p + q = b</span> (сумма = коэффициент при x) &nbsp;·&nbsp; <span class="hl">p × q = c</span> (произведение = свободный член)</p>
+    <p style="margin-top:8px;">Тогда: \(x^2+bx+c = (x+p)(x+q)\)</p>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <h2>Алгоритм · Algorithm</h2>
+    <div class="algo-list">
+      <div class="algo-step">
+        <div class="algo-badge">01</div>
+        <div class="algo-body">
+          <h4>Определить a, b, c · Identify a, b, c</h4>
+          <p>Записать коэффициенты трёхчлена.</p>
+          <span class="algo-note">\(x^2+9x+14 \Rightarrow a=1,\;b=9,\;c=14\)</span>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-badge">02</div>
+        <div class="algo-body">
+          <h4>Найти пары делителей c · Factor pairs of c</h4>
+          <p>Перечислить пары чисел, произведение которых равно c. Не забыть об отрицательных!</p>
+          <span class="algo-note">14 → (1,14), (2,7), (−1,−14), (−2,−7)</span>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-badge purple">03</div>
+        <div class="algo-body">
+          <h4>Выбрать пару с нужной суммой · Pick the pair with sum = b</h4>
+          <p>Из всех пар выбрать ту, сумма которой равна b.</p>
+          <span class="algo-note purple">2 + 7 = 9 ✓ → (x+2)(x+7)</span>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-badge purple">04</div>
+        <div class="algo-body">
+          <h4>Проверить раскрытием скобок · Check by expanding</h4>
+          <p>\((x+2)(x+7) = x^2+7x+2x+14 = x^2+9x+14\) ✓</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXAMPLES a=1 -->
+<div>
+  <div class="sec-label">Примеры · Worked Examples (a = 1)</div>
+
+  <div class="example-card">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 1 · Example 1</div></div>
+      <div class="example-eq-badge">\(x^2+7x+12\)</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row"><span class="step-n">①</span><span class="step-formula">\(a=1,\;b=7,\;c=12\)</span><span class="step-comment">определяем коэффициенты</span></div>
+      <div class="step-row"><span class="step-n">②</span><span class="step-formula">Делители 12: \((1,12),(2,6),(3,4)\)</span><span class="step-comment">factor pairs of 12</span></div>
+      <div class="step-row"><span class="step-n">③</span><span class="step-formula">\(3+4=7=b\) ✓ → берём 3 и 4</span><span class="step-comment">сумма = b</span></div>
+      <div class="step-row answer-row"><span class="step-n">✓</span><span class="step-formula">\(x^2+7x+12=(x+3)(x+4)\)</span></div>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 2 · Example 2 — отрицательный b</div></div>
+      <div class="example-eq-badge">\(x^2-3x+2\)</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row"><span class="step-n">①</span><span class="step-formula">\(a=1,\;b=-3,\;c=2\)</span><span class="step-comment">c > 0, b < 0 → оба числа отрицательны</span></div>
+      <div class="step-row"><span class="step-n">②</span><span class="step-formula">Делители 2: \((-1,-2)\) → \(-1+(-2)=-3\) ✓</span><span class="step-comment">both negative</span></div>
+      <div class="step-row answer-row"><span class="step-n">✓</span><span class="step-formula">\(x^2-3x+2=(x-1)(x-2)\)</span></div>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 3 · Example 3 — отрицательный c</div></div>
+      <div class="example-eq-badge">\(x^2+2x-15\)</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row"><span class="step-n">①</span><span class="step-formula">\(a=1,\;b=2,\;c=-15\)</span><span class="step-comment">c < 0 → числа разных знаков</span></div>
+      <div class="step-row"><span class="step-n">②</span><span class="step-formula">Делители −15: \((5,-3)\) → \(5+(-3)=2\) ✓</span><span class="step-comment">opposite signs</span></div>
+      <div class="step-row answer-row"><span class="step-n">✓</span><span class="step-formula">\(x^2+2x-15=(x+5)(x-3)\)</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ §3 \(a \neq 1\) ══ -->
+<div>
+  <div class="sec-label">§3 · Коэффициент \(a \neq 1\) · When \(a \neq 1\)</div>
+  <div class="key-rule">
+    <div class="key-rule-title">⚡ AC-метод / Splitting the Middle Term</div>
+    <p>Для \(ax^2+bx+c\) найти <span class="hl">два числа p и q</span> такие, что:</p>
+    <p style="margin-top:8px;"><span class="hlp">p + q = b</span> (сумма = b) &nbsp;·&nbsp; <span class="hl">p × q = a·c</span> (произведение = a×c, не просто c!)</p>
+    <p style="margin-top:8px;">Затем разбить средний член \(bx\) на \(px + qx\) и вынести общие множители.</p>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <h2>AC-метод: 4 шага · AC Method: 4 Steps</h2>
+    <div class="algo-list">
+      <div class="algo-step">
+        <div class="algo-badge">01</div>
+        <div class="algo-body">
+          <h4>Найти a·c · Multiply a × c</h4>
+          <p>Вычислить произведение крайних коэффициентов. Именно это произведение, а не просто c!</p>
+          <span class="algo-note">\(6x^2+x-2 \Rightarrow a\cdot c = 6\times(-2)=-12\)</span>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-badge">02</div>
+        <div class="algo-body">
+          <h4>Найти два числа p, q · Find p and q</h4>
+          <p>Перебрать делители (a·c) и найти пару с суммой b.</p>
+          <span class="algo-note">−12: пара (4, −3) → \(4+(-3)=1=b\) ✓</span>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-badge purple">03</div>
+        <div class="algo-body">
+          <h4>Разбить средний член · Split the middle term</h4>
+          <p>Заменить bx на px + qx (порядок не важен).</p>
+          <span class="algo-note purple">\(6x^2+4x-3x-2\)</span>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-badge green">04</div>
+        <div class="algo-body">
+          <h4>Вынести общие множители парами · Factorise in pairs</h4>
+          <p>Сгруппировать попарно и вынести общий множитель. Скобка должна совпасть!</p>
+          <span class="algo-note green">\(2x(3x+2)-1(3x+2)=(3x+2)(2x-1)\)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXAMPLES \(a \neq 1\) -->
+<div>
+  <div class="sec-label">Примеры · Worked Examples \(a \neq 1\)</div>
+
+  <div class="example-card">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 4 · AC-метод</div></div>
+      <div class="example-eq-badge">\(3x^2+13x+4\)</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row"><span class="step-n">①</span><span class="step-formula">\(a=3,\;b=13,\;c=4\) → \(a\cdot c=3\times 4=12\)</span><span class="step-comment">multiply a × c</span></div>
+      <div class="step-row"><span class="step-n">②</span><span class="step-formula">Делители 12: \((1,12)\) → \(1+12=13=b\) ✓</span><span class="step-comment">find pair with sum = 13</span></div>
+      <div class="step-row"><span class="step-n">③</span><span class="step-formula">\(3x^2+x+12x+4\)</span><span class="step-comment">split the middle term</span></div>
+      <div class="step-row"><span class="step-n">④</span><span class="step-formula">\(x(3x+1)+4(3x+1)\)</span><span class="step-comment">factorise in pairs</span></div>
+      <div class="step-row answer-row"><span class="step-n">✓</span><span class="step-formula">\(3x^2+13x+4=(3x+1)(x+4)\)</span></div>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 5 · AC-метод — отрицательный c</div></div>
+      <div class="example-eq-badge">\(6x^2+x-2\)</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row"><span class="step-n">①</span><span class="step-formula">\(a=6,\;b=1,\;c=-2\) → \(a\cdot c=-12\)</span><span class="step-comment">a·c отрицательный</span></div>
+      <div class="step-row"><span class="step-n">②</span><span class="step-formula">\((4,-3)\): \(4+(-3)=1=b\) ✓ и \(4\times(-3)=-12\) ✓</span><span class="step-comment">opposite signs, different values</span></div>
+      <div class="step-row"><span class="step-n">③</span><span class="step-formula">\(6x^2+4x-3x-2\)</span><span class="step-comment">split: +4x and −3x</span></div>
+      <div class="step-row"><span class="step-n">④</span><span class="step-formula">\(2x(3x+2)-1(3x+2)\)</span><span class="step-comment">factorise in pairs</span></div>
+      <div class="step-row answer-row"><span class="step-n">✓</span><span class="step-formula">\(6x^2+x-2=(3x+2)(2x-1)\)</span></div>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-header">
+      <div><div class="example-header-label">Пример 6 · AC-метод — общий множитель сначала</div></div>
+      <div class="example-eq-badge">\(6x^2-27x+30\)</div>
+    </div>
+    <div class="example-body">
+      <div class="step-row"><span class="step-n">⚠</span><span class="step-formula">Сначала вынести общий множитель (GCF) = 3</span><span class="step-comment">always check GCF first!</span></div>
+      <div class="step-row"><span class="step-n">①</span><span class="step-formula">\(3(2x^2-9x+10)\)</span><span class="step-comment">factor out 3</span></div>
+      <div class="step-row"><span class="step-n">②</span><span class="step-formula">\(a\cdot c=2\times10=20\) → пара \((-4,-5)\): \(-4+(-5)=-9\) ✓</span><span class="step-comment">ac-method on inner</span></div>
+      <div class="step-row"><span class="step-n">③</span><span class="step-formula">\(3(2x^2-4x-5x+10)=3[2x(x-2)-5(x-2)]\)</span><span class="step-comment">split and pair</span></div>
+      <div class="step-row answer-row"><span class="step-n">✓</span><span class="step-formula">\(6x^2-27x+30=3(2x-5)(x-2)\)</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ §4 ЗНАКИ ══ -->
+<div>
+  <div class="sec-label">§4 · Подсказка по знакам · Sign Guide</div>
+  <div class="card">
+    <h2>Как определить знаки в скобках?</h2>
+    <p style="margin-bottom:16px;">Для случая <strong>a = 1</strong> — простое правило по знакам b и c:</p>
+    <table style="width:100%;border-collapse:collapse;font-size:.88rem;">
+      <thead>
+        <tr style="background:var(--purple-lt);">
+          <th style="padding:10px 14px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--purple);letter-spacing:.08em;">Знаки b и c</th>
+          <th style="padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--purple);">Знаки в скобках</th>
+          <th style="padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--purple);">Пример</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;">\(b>0,\;c>0\)</td>
+          <td style="padding:10px 14px;text-align:center;background:var(--green-lt);color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:700;">(+)(+)</td>
+          <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;">\(x^2+5x+6=(x+2)(x+3)\)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;">\(b<0,\;c>0\)</td>
+          <td style="padding:10px 14px;text-align:center;background:var(--pink-lt);color:var(--pink);font-family:'JetBrains Mono',monospace;font-weight:700;">(−)(−)</td>
+          <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;">\(x^2-5x+6=(x-2)(x-3)\)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;">\(b>0,\;c<0\)</td>
+          <td style="padding:10px 14px;text-align:center;background:var(--amber-lt);color:var(--amber);font-family:'JetBrains Mono',monospace;font-weight:700;">(+)(−) бо́льш.+</td>
+          <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;">\(x^2+2x-15=(x+5)(x-3)\)</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;">\(b<0,\;c<0\)</td>
+          <td style="padding:10px 14px;text-align:center;background:var(--blue-lt);color:var(--blue);font-family:'JetBrains Mono',monospace;font-weight:700;">(+)(−) бо́льш.−</td>
+          <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;">\(x^2-2x-15=(x-5)(x+3)\)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ HOMEWORK ══ -->
+<div>
+  <div class="sec-label">Домашнее задание · Homework</div>
+  <div class="card">
+    <h2>Задания для отработки</h2>
+    <p style="margin-bottom:16px;">Нажми на задание, чтобы отметить выполненным. Раздели: a=1 и \(a \neq 1\)!</p>
+
+    <div class="progress-wrap"><div class="progress-fill" id="pBar"></div></div>
+    <div class="progress-text" id="pLabel">0 / 14 выполнено</div>
+
+    <!-- a=1 -->
+    <div class="hw-group-label">🟢 \(a = 1\) — метод двух чисел</div>
+    <div class="hw-grid">
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">1.</span><span class="hw-eq">\(x^2+9x+18\)</span><span class="hw-lv lv1">\(a=1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">2.</span><span class="hw-eq">\(x^2+12x+27\)</span><span class="hw-lv lv1">\(a=1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">3.</span><span class="hw-eq">\(x^2-7x+12\)</span><span class="hw-lv lv1">\(a=1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">4.</span><span class="hw-eq">\(x^2+5x+6\)</span><span class="hw-lv lv1">\(a=1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">5.</span><span class="hw-eq">\(x^2-2x-8\)</span><span class="hw-lv lv1">\(a=1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">6.</span><span class="hw-eq">\(x^2+x-12\)</span><span class="hw-lv lv1">\(a=1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">7.</span><span class="hw-eq">\(x^2-8x+15\)</span><span class="hw-lv lv1">\(a=1\)</span><div class="hw-check">✓</div></div>
+    </div>
+
+    <!-- \(a \neq 1\) -->
+    <div class="hw-group-label">🔴 \(a \neq 1\) — AC-метод</div>
+    <div class="hw-grid">
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">8.</span><span class="hw-eq">\(2x^2+5x+3\)</span><span class="hw-lv lv2">\(a \neq 1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">9.</span><span class="hw-eq">\(3x^2+7x+2\)</span><span class="hw-lv lv2">\(a \neq 1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">10.</span><span class="hw-eq">\(2x^2+7x+3\)</span><span class="hw-lv lv2">\(a \neq 1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">11.</span><span class="hw-eq">\(3x^2-5x-2\)</span><span class="hw-lv lv2">\(a \neq 1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">12.</span><span class="hw-eq">\(2x^2-x-15\)</span><span class="hw-lv lv2">\(a \neq 1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">13.</span><span class="hw-eq">\(6x^2+7x+2\)</span><span class="hw-lv lv2">\(a \neq 1\)</span><div class="hw-check">✓</div></div>
+      <div class="hw-item" onclick="tog(this)"><span class="hw-num">14.</span><span class="hw-eq">\(4y^2-23y+15\)</span><span class="hw-lv lv2">\(a \neq 1\)</span><div class="hw-check">✓</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ QUIZ ══ -->
+<div>
+  <div class="sec-label">Тест · Quick Quiz</div>
+  <div class="card">
+    <h2>5 вопросов · 5 Questions</h2>
+    <p style="margin-bottom:18px;">Выбери правильный вариант факторизации.</p>
+
+    <div class="progress-row">
+      <div>
+        <div class="progress-wrap" style="width:200px;"><div class="progress-fill" id="qBar"></div></div>
+        <div class="progress-text" id="qLabel">0 / 5 отвечено</div>
+      </div>
+      <div class="score-badge" id="qScore">Счёт: 0</div>
+    </div>
+
+    <div id="quizWrap"></div>
+    <button class="restart-btn" id="restBtn" onclick="buildQuiz()">Пройти ещё раз</button>
+  </div>
+</div>
+
+<footer>Factorising Quadratics · Разложение квадратных трёхчленов · Algebra · Self-Study</footer>
+
+</div><!-- .page -->
+
+<script>
+// ── HW progress ────────────────────────────────────────────────
+function tog(el) {
+  el.classList.toggle('done');
+  const total = document.querySelectorAll('.hw-item').length;
+  const done  = document.querySelectorAll('.hw-item.done').length;
+  document.getElementById('pBar').style.width = Math.round(done/total*100)+'%';
+  document.getElementById('pLabel').textContent = done+' / '+total+' выполнено';
+}
+
+// ── QUIZ DATA ───────────────────────────────────────────────────
+// opts: array of LaTeX strings; ansIdx: index of correct answer (0-based)
+const QUIZ = [
+  {
+    q:      'Разложи: \\(x^2 + 9x + 14\\)',
+    opts:   ['\\(x^2+9x+14=(x+3)(x+6)\\)',
+             '\\(x^2+9x+14=(x+14)(x+1)\\)',
+             '\\(x^2+9x+14=(x+7)(x+2)\\)',
+             '\\(x^2+9x+14=(x+4)(x+5)\\)'],
+    ansIdx: 2,
+    hint:   'a=1: ищем p+q=9 и p×q=14 → 7+2=9, 7×2=14 ✓ → (x+7)(x+2)'
+  },
+  {
+    q:      'Разложи: \\(x^2 - 5x + 6\\)',
+    opts:   ['\\(x^2-5x+6=(x+2)(x+3)\\)',
+             '\\(x^2-5x+6=(x-2)(x-3)\\)',
+             '\\(x^2-5x+6=(x-6)(x+1)\\)',
+             '\\(x^2-5x+6=(x-1)(x-6)\\)'],
+    ansIdx: 1,
+    hint:   'b<0, c>0 → оба числа отрицательны: −2+(−3)=−5, (−2)×(−3)=6 ✓ → (x−2)(x−3)'
+  },
+  {
+    q:      'Разложи: \\(2x^2 + 5x + 3\\)',
+    opts:   ['\\(2x^2+5x+3=(2x+1)(x+3)\\)',
+             '\\(2x^2+5x+3=(x+1)(x+3)\\)',
+             '\\(2x^2+5x+3=(x+3)(2x+3)\\)',
+             '\\(2x^2+5x+3=(2x+3)(x+1)\\)'],
+    ansIdx: 3,
+    hint:   'AC-метод: a·c=6, пара (2,3) → 2+3=5=b → split: 2x(x+1)+3(x+1) → (2x+3)(x+1)'
+  },
+  {
+    q:      'Разложи: \\(x^2 + 2x - 15\\)',
+    opts:   ['\\(x^2+2x-15=(x-5)(x+3)\\)',
+             '\\(x^2+2x-15=(x+15)(x-1)\\)',
+             '\\(x^2+2x-15=(x+5)(x-3)\\)',
+             '\\(x^2+2x-15=(x+3)(x-5)\\)'],
+    ansIdx: 2,
+    hint:   'c<0 → числа разных знаков: 5+(−3)=2=b, 5×(−3)=−15=c ✓ → (x+5)(x−3)'
+  },
+  {
+    q:      'Разложи: \\(3x^2 - 11x + 6\\)',
+    opts:   ['\\(3x^2-11x+6=(3x-6)(x-1)\\)',
+             '\\(3x^2-11x+6=(3x+2)(x-3)\\)',
+             '\\(3x^2-11x+6=(x-3)(3x-6)\\)',
+             '\\(3x^2-11x+6=(3x-2)(x-3)\\)'],
+    ansIdx: 3,
+    hint:   'AC: a·c=18, пара (−2,−9): −2+(−9)=−11=b → split: x(3x−2)−3(3x−2) → (3x−2)(x−3)'
+  },
+];
+
+// ── BUILD QUIZ ──────────────────────────────────────────────────
+let qAns = 0, qScore = 0;
+
+function buildQuiz() {
+  qAns = 0; qScore = 0;
+  document.getElementById('qBar').style.width = '0%';
+  document.getElementById('qLabel').textContent = '0 / 5 отвечено';
+  document.getElementById('qScore').textContent = 'Счёт: 0';
+  document.getElementById('restBtn').style.display = 'none';
+
+  const wrap = document.getElementById('quizWrap');
+  wrap.innerHTML = '';
+
+  QUIZ.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'quiz-card';
+    card.id = 'qc' + qi;
+
+    // Build option buttons – use data-idx for comparison, no text comparison
+    const optsHTML = q.opts.map((o, oi) =>
+      `<button class="quiz-opt" data-idx="${oi}" onclick="qAnswer(${qi},${oi})">${o}</button>`
+    ).join('');
+
+    card.innerHTML =
+      `<div class="quiz-q">${qi+1}. ${q.q}</div>` +
+      `<div class="quiz-opts">${optsHTML}</div>` +
+      `<div class="quiz-fb" id="qfb${qi}"></div>`;
+    wrap.appendChild(card);
+  });
+
+  // Render KaTeX inside quiz wrap only
+  if (window.renderMathInElement) {
+    renderMathInElement(wrap, {
+      delimiters: [
+        {left: '\\(', right: '\\)', display: false},
+        {left: '$$', right: '$$', display: true}
+      ],
+      throwOnError: false
+    });
+  }
+}
+
+// ── ANSWER HANDLER ──────────────────────────────────────────────
+function qAnswer(qi, chosenIdx) {
+  const card = document.getElementById('qc' + qi);
+  if (card.dataset.done) return;
+  card.dataset.done = '1';
+
+  const q = QUIZ[qi];
+  const btns = card.querySelectorAll('.quiz-opt');
+  const correct = q.ansIdx;
+
+  btns.forEach(b => {
+    b.disabled = true;
+    if (+b.dataset.idx === correct) {
+      b.classList.add(chosenIdx === correct ? 'correct' : 'reveal');
+    }
+  });
+
+  const chosenBtn = btns[chosenIdx];
+  const fb = document.getElementById('qfb' + qi);
+
+  if (chosenIdx === correct) {
+    chosenBtn.classList.remove('reveal');
+    chosenBtn.classList.add('correct');
+    fb.textContent = '✓ Правильно! ' + q.hint;
+    fb.className = 'quiz-fb show ok';
+    qScore++;
+  } else {
+    chosenBtn.classList.add('wrong');
+    fb.textContent = '✗ Неверно. ' + q.hint;
+    fb.className = 'quiz-fb show err';
+  }
+
+  qAns++;
+  document.getElementById('qScore').textContent = 'Счёт: ' + qScore;
+  document.getElementById('qBar').style.width = Math.round(qAns / QUIZ.length * 100) + '%';
+  document.getElementById('qLabel').textContent = qAns + ' / ' + QUIZ.length + ' отвечено';
+  if (qAns === QUIZ.length) {
+    setTimeout(() => document.getElementById('restBtn').style.display = 'inline-block', 500);
+  }
+}
+
+// ── INIT ────────────────────────────────────────────────────────
+// KaTeX auto-render for the static page content
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '\\(', right: '\\)', display: false},
+        {left: '$$', right: '$$', display: true}
+      ],
+      throwOnError: false
+    });
+  }
+  buildQuiz();
+});
+</script>
+</body>
+</html>
