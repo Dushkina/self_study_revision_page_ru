@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Биномиальное разложение и комбинации</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+<style>
+  :root{
+    --bg:#f7f4f0;
+    --card:#ffffff;
+    --pink:#e84fa3;
+    --purple:#7c5cbf;
+    --pink-light:#fde8f4;
+    --pink-mid:#f9c9e8;
+    --purple-light:#ede8f8;
+    --ink:#1a1228;
+    --muted:#7a6e82;
+    --border:#e5dff0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    padding:48px 24px;
+    line-height:1.55;
+  }
+  .page{ max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:28px; }
+  h1,h2,h3,.serif{ font-family:'DM Serif Display', serif; font-weight:400; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  .card{ background:var(--card); border-radius:20px; border:1.5px solid var(--border); padding:28px; }
+
+  /* ---------- Header ---------- */
+  .header{ position:relative; overflow:hidden; background:var(--ink); border-radius:24px; padding:44px 32px; color:#f7f4f0; }
+  .header .blob{ position:absolute; border-radius:50%; filter:blur(50px); opacity:0.55; z-index:0; }
+  .header .blob1{ width:260px; height:260px; background:var(--pink); top:-100px; right:-60px;}
+  .header .blob2{ width:220px; height:220px; background:var(--purple); bottom:-90px; left:-60px;}
+  .header-content{ position:relative; z-index:1; }
+  .badge{ position:absolute; top:0; right:0; background:var(--pink); color:#fff; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:7px 14px; border-radius:20px; font-weight:600; z-index:2; }
+  .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.12em; color:var(--pink-mid); margin:0 0 14px 0; }
+  .header h1{ font-size:32px; margin:0 0 6px 0; line-height:1.18; color:#fff; }
+  .header .subtitle{ font-family:'JetBrains Mono', monospace; font-size:14px; color:#cfc3e0; margin:0 0 20px 0; }
+  .meta-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+  .meta-pill{ font-family:'JetBrains Mono', monospace; font-size:11.5px; padding:6px 12px; border-radius:20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#e9e2f4; }
+
+  /* ---------- Section labels ---------- */
+  .section-label{ display:flex; align-items:center; gap:12px; font-family:'JetBrains Mono', monospace; font-size:12.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:4px; }
+  .section-label::before{ content:""; display:inline-block; width:24px; height:3px; background:var(--pink); border-radius:2px; }
+  .section-title{ font-size:26px; margin:2px 0 6px 0; }
+  .section-sub{ color:var(--muted); font-size:15px; margin:0 0 8px 0; }
+
+  .divider{ height:2px; border:none; background:linear-gradient(90deg, var(--pink), var(--purple)); opacity:0.25; margin:4px 0; }
+
+  /* ---------- Theory ---------- */
+  .theory-block{ display:flex; flex-direction:column; gap:16px; }
+  .formula-box{ background:rgba(255,255,255,0.6); border:1.5px solid var(--border); border-radius:16px; padding:20px 22px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:17px; overflow-x:auto; }
+  .formula-box.pink{ background:var(--pink-light); }
+  .formula-box.purple{ background:var(--purple-light); }
+  .rule-callout{ background:var(--pink-light); border-left:4px solid var(--pink); border-radius:12px; padding:16px 20px; font-size:15px; }
+  .rule-callout b{ color:var(--pink); }
+  .note-box{ background:var(--purple-light); border-left:4px solid var(--purple); border-radius:12px; padding:14px 18px; font-size:13.5px; color:var(--ink); }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+
+  /* Pascal's triangle */
+  .pascal{ display:flex; flex-direction:column; align-items:center; gap:8px; font-family:'JetBrains Mono', monospace; font-size:15px; padding:10px 0; }
+  .pascal .prow{ display:flex; gap:14px; }
+  .pascal .prow span{ min-width:22px; text-align:center; color:var(--purple); font-weight:700; }
+
+  /* ---------- Tags ---------- */
+  .tag{ display:inline-block; font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; padding:4px 12px; border-radius:20px; font-weight:600; }
+  .tag-combo{ background:#e3f5e9; color:#1c8a4c; }
+  .tag-expand{ background:var(--purple-light); color:var(--purple); }
+
+  /* ---------- Worked examples ---------- */
+  .example-card{ border-radius:20px; overflow:hidden; border:1.5px solid var(--border); background:var(--card); }
+  .example-header{ background:linear-gradient(135deg,#1e0e35,#3a1f6e); color:#fff; padding:18px 22px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .example-header .ex-title{ font-family:'DM Serif Display', serif; font-size:20px; }
+  .given-badge{ font-family:'JetBrains Mono', monospace; background:var(--pink); color:#fff; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; white-space:nowrap; }
+  .example-body{ padding:22px; display:flex; flex-direction:column; gap:16px; }
+  .steps{ display:flex; flex-direction:column; gap:12px; }
+  .step{ display:flex; gap:14px; align-items:flex-start; }
+  .step-badge{ flex:none; width:30px; height:30px; border-radius:50%; background:var(--pink-light); color:var(--pink); font-family:'JetBrains Mono', monospace; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .step-badge.purple{ background:var(--purple-light); color:var(--purple); }
+  .step-content{ flex:1; min-width:0; }
+  .step-label{ font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:3px; }
+  .step-formula{ font-family:'JetBrains Mono', monospace; font-size:15px; overflow-x:auto; }
+  .answer-row{ background:var(--pink-light); border-radius:12px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-family:'JetBrains Mono', monospace; font-weight:600; font-size:15px; }
+  .answer-row .val{ color:var(--pink); font-size:16px; }
+
+  /* ---------- Homework grid ---------- */
+  .hw-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .hw-card{ border-radius:18px; border:1.5px solid var(--border); background:var(--card); padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .hw-num{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .hw-num-label{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+  .hw-problem{ font-family:'JetBrains Mono', monospace; font-size:16px; overflow-x:auto; min-height:24px; }
+
+  .hw-section-header{
+    grid-column: 1 / -1;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--purple);
+    font-weight:700;
+    padding:14px 4px 2px 4px;
+    border-top:2px dashed var(--border);
+    margin-top:6px;
+  }
+  .hw-section-header:first-child{ border-top:none; margin-top:0; padding-top:0; }
+
+  /* ---------- Quiz ---------- */
+  .quiz-q{ border:1.5px solid var(--border); border-radius:16px; padding:18px; margin-bottom:16px; background:var(--card); }
+  .quiz-q .qtext{ font-weight:600; margin-bottom:12px; font-size:15px; }
+  .quiz-options{ display:flex; flex-direction:column; gap:8px; }
+  .quiz-option{ display:flex; align-items:center; gap:10px; border:1.5px solid var(--border); border-radius:12px; padding:10px 14px; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:13.5px; transition:background 0.15s, border-color 0.15s; }
+  .quiz-option:hover{ background:var(--pink-light); }
+  .quiz-option.selected{ border-color:var(--purple); background:var(--purple-light); }
+  .quiz-option.correct{ border-color:#1c8a4c; background:#e3f5e9; }
+  .quiz-option.wrong{ border-color:#c0367a; background:#fde3ec; }
+  #quizSubmit, #quizReset{ border:none; background:var(--pink); color:#fff; font-family:'JetBrains Mono', monospace; font-weight:600; font-size:14px; padding:12px 22px; border-radius:14px; cursor:pointer; margin-right:10px; }
+  #quizReset{ background:var(--purple); }
+  #quizResult{ font-family:'JetBrains Mono', monospace; font-size:16px; font-weight:600; margin-top:14px; }
+
+  footer{ text-align:center; color:var(--muted); font-family:'JetBrains Mono', monospace; font-size:12px; padding:12px 0 4px 0; }
+
+  @media (max-width:640px){
+    body{ padding:28px 14px; }
+    .two-col, .hw-grid{ grid-template-columns:1fr; }
+    .header h1{ font-size:23px; }
+    .badge{ position:static; display:inline-block; margin-bottom:14px; }
+    .header .header-content{ display:flex; flex-direction:column; }
+    .pascal .prow{ gap:8px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ================= HEADER ================= -->
+  <header class="header">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <span class="badge">algebra · combinatorics</span>
+    <div class="header-content">
+      <p class="eyebrow">Section 8.3 · The Binomial Expansion</p>
+      <h1>Биномиальное разложение и&nbsp;комбинации</h1>
+      <p class="subtitle">The Binomial Expansion &amp; Combinations (nCr)</p>
+      <div class="meta-row">
+        <span class="meta-pill">уровень · standard</span>
+        <span class="meta-pill">⏱ 25–30 min self-study</span>
+        <span class="meta-pill">6 worked examples</span>
+        <span class="meta-pill">15 practice · 5 quiz</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= THEORY 1: BINOMIAL EXPANSION ================= -->
+  <section class="card theory-block">
+    <div class="section-label">теория · theory</div>
+    <h2 class="section-title serif">Биномиальное разложение</h2>
+    <p class="section-sub">The Binomial Expansion — как раскрыть скобки в выражении вида (a+b)ⁿ.</p>
+
+    <p><b>Binomial expression</b> (биномиальное выражение) — это выражение из <b>двух слагаемых</b>, например <span class="mono">a+b</span>. Раскрывать <span class="mono">(a+b)⁵</span> вручную умножением долго — вместо этого используем готовую формулу.</p>
+
+    <div class="formula-box pink">
+      $$(a+b)^n=a^n+\binom{n}{1}a^{n-1}b+\binom{n}{2}a^{n-2}b^2+\dots+\binom{n}{r}a^{n-r}b^r+\dots+b^n \quad (n\in\mathbb{N})$$
+    </div>
+
+    <div class="note-box"><b>Notation:</b> <span class="mono">n ∈ ℕ</span> означает, что n — натуральное число (member of the natural numbers), то есть любое положительное целое число (positive integer).</div>
+
+    <p style="font-size:14.5px;">Каждый коэффициент <span class="mono">(n r)</span> показывает, <b>сколько раз</b> при раскрытии скобок встречается слагаемое <span class="mono">aⁿ⁻ʳbʳ</span> — то есть сколькими способами можно выбрать b ровно r раз из n скобок.</p>
+
+    <div class="formula-box purple">
+      $$\text{Специальный случай (special case):}\quad (1+x)^n=\binom{n}{0}+\binom{n}{1}x+\binom{n}{2}x^2+\dots+\binom{n}{n}x^n$$
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ================= THEORY 2: PASCAL'S TRIANGLE ================= -->
+  <section class="card theory-block">
+    <div class="section-label">теория · theory</div>
+    <h2 class="section-title serif">Треугольник Паскаля</h2>
+    <p class="section-sub">Pascal's Triangle — быстрый способ найти коэффициенты без формулы.</p>
+
+    <p>Каждое число в треугольнике Паскаля — это <b>сумма двух чисел над ним</b> (the sum of the two numbers above it). Строка номер n даёт все коэффициенты для <span class="mono">(a+b)ⁿ</span>.</p>
+
+    <div class="pascal">
+      <div class="prow"><span>1</span></div>
+      <div class="prow"><span>1</span><span>1</span></div>
+      <div class="prow"><span>1</span><span>2</span><span>1</span></div>
+      <div class="prow"><span>1</span><span>3</span><span>3</span><span>1</span></div>
+      <div class="prow"><span>1</span><span>4</span><span>6</span><span>4</span><span>1</span></div>
+      <div class="prow"><span>1</span><span>5</span><span>10</span><span>10</span><span>5</span><span>1</span></div>
+      <div class="prow"><span>1</span><span>6</span><span>15</span><span>20</span><span>15</span><span>6</span><span>1</span></div>
+    </div>
+
+    <div class="two-col">
+      <div class="formula-box">$$(a+b)^2=1a^2+2ab+1b^2$$</div>
+      <div class="formula-box">$$(a+b)^4=1a^4+4a^3b+6a^2b^2+4ab^3+1b^4$$</div>
+    </div>
+
+    <div class="rule-callout"><b>Совет (tip):</b> строка n=6 даёт коэффициенты 1, 6, 15, 20, 15, 6, 1 — именно их мы используем в примере 5 ниже для <span class="mono">(2x−1)⁶</span>.</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ================= THEORY 3: COMBINATIONS ================= -->
+  <section class="card theory-block">
+    <div class="section-label">теория · theory</div>
+    <h2 class="section-title serif">Комбинации и факториал</h2>
+    <p class="section-sub">Combinations (nCr) &amp; Factorial — как вычислить биномиальный коэффициент.</p>
+
+    <div class="formula-box pink">
+      $$\binom{n}{r}={}^nC_r=\frac{n!}{r!\,(n-r)!}$$
+    </div>
+
+    <p><span class="mono">n!</span> («n факториал», <i>n factorial</i>) — это произведение всех целых чисел от n до 1:</p>
+
+    <div class="formula-box">
+      $$n!=n(n-1)(n-2)(n-3)\cdots 3\times2\times1$$
+    </div>
+
+    <p style="font-size:14.5px;">Например (for example): <span class="mono">7! = 7×6×5×4×3×2×1 = 5040</span>.</p>
+
+    <div class="note-box">Важно (important): <span class="mono">(n r)</span> и <span class="mono">ⁿCᵣ</span> — это ровно одно и то же число, просто две разные записи (two different notations for the same value).</div>
+  </section>
+
+  <!-- ================= WORKED EXAMPLES ================= -->
+  <section>
+    <div class="section-label">примеры · worked examples</div>
+    <h2 class="section-title serif">6 разобранных примеров</h2>
+    <p class="section-sub">Примеры 1–4 — вычисление комбинаций (как разбирали в Example 29); примеры 5–6 — полное разложение по биному Ньютона.</p>
+  </section>
+
+  <!-- WE1 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 1 · Example 1</span>
+      <span class="given-badge">$\binom{7}{3}$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-combo">комбинации · formula</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Calculate the combination using the formula.</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">формула · apply the formula</div><div class="step-formula">$$\binom{7}{3}=\frac{7!}{3!\,(7-3)!}=\frac{7!}{3!\,4!}$$</div></div></div>
+        <div class="step"><div class="step-badge">2</div><div class="step-content"><div class="step-label">сократите · cancel the 4! (a common trick)</div><div class="step-formula">$$=\frac{7\times6\times5\times4!}{3!\times4!}=\frac{7\times6\times5}{3\times2\times1}$$</div></div></div>
+        <div class="step"><div class="step-badge">3</div><div class="step-content"><div class="step-label">вычислите · simplify</div><div class="step-formula">$$=\frac{210}{6}=35$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">7C3 = 35</span></div>
+    </div>
+  </div>
+
+  <!-- WE2 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 2 · Example 2</span>
+      <span class="given-badge">$^8C_5$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-combo">комбинации · formula</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Calculate the combination using the formula.</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">формула · apply the formula</div><div class="step-formula">$${}^8C_5=\frac{8!}{5!\,(8-5)!}=\frac{8!}{5!\,3!}$$</div></div></div>
+        <div class="step"><div class="step-badge">2</div><div class="step-content"><div class="step-label">сократите · cancel the 5!</div><div class="step-formula">$$=\frac{8\times7\times6\times5!}{5!\times3!}=\frac{8\times7\times6}{3\times2\times1}$$</div></div></div>
+        <div class="step"><div class="step-badge">3</div><div class="step-content"><div class="step-label">вычислите · simplify</div><div class="step-formula">$$=\frac{336}{6}=56$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">8C5 = 56</span></div>
+    </div>
+  </div>
+
+  <!-- WE3 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 3 · Example 3</span>
+      <span class="given-badge">$\binom{4}{1}$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-combo">комбинации · частный случай r=1</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Calculate the combination — a simple edge case where r = 1.</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">формула · apply the formula</div><div class="step-formula">$$\binom{4}{1}=\frac{4!}{1!\,3!}=\frac{4\times3!}{1\times3!}=4$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">C(4,1) = 4</span></div>
+    </div>
+  </div>
+
+  <!-- WE4 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 4 · Example 4</span>
+      <span class="given-badge">$^6C_4$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-combo">комбинации · проверка по треугольнику Паскаля</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Calculate the combination, then check it against Pascal's triangle (row n=6).</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">формула · apply the formula</div><div class="step-formula">$${}^6C_4=\frac{6!}{4!\,2!}=\frac{6\times5}{2\times1}=15$$</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">проверка · check with Pascal's row 6</div><div class="step-formula">1, 6, <b>15</b>, 20, <b>15</b>, 6, 1 — совпадает! (matches)</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">6C4 = 15</span></div>
+    </div>
+  </div>
+
+  <!-- WE5 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 5 · Example 5</span>
+      <span class="given-badge">$(x+2)^4$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-expand">разложение · Pascal's triangle</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Expand using Pascal's triangle (row n=4: 1, 4, 6, 4, 1).</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">определите a и b · identify a and b</div><div class="step-formula">$$a=x,\quad b=2$$</div></div></div>
+        <div class="step"><div class="step-badge">2</div><div class="step-content"><div class="step-label">возьмите строку n=4 · take Pascal's row for n=4</div><div class="step-formula">1, 4, 6, 4, 1</div></div></div>
+        <div class="step"><div class="step-badge purple">3</div><div class="step-content"><div class="step-label">подставьте · substitute into 1a⁴+4a³b+6a²b²+4ab³+1b⁴</div><div class="step-formula">$$(x+2)^4=x^4+4x^3(2)+6x^2(2)^2+4x(2)^3+(2)^4$$</div></div></div>
+        <div class="step"><div class="step-badge purple">4</div><div class="step-content"><div class="step-label">упростите · simplify each term</div><div class="step-formula">$$=x^4+8x^3+24x^2+32x+16$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">x⁴+8x³+24x²+32x+16</span></div>
+    </div>
+  </div>
+
+  <!-- WE6 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 6 · Example 6</span>
+      <span class="given-badge">$(2x-1)^6$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-expand">разложение · полный пример с урока</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Expand using Pascal's triangle — full worked example (as done in class).</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">возьмите строку n=6 · Pascal's row for n=6</div><div class="step-formula">1, 6, 15, 20, 15, 6, 1</div></div></div>
+        <div class="step"><div class="step-badge">2</div><div class="step-content"><div class="step-label">общая формула · general pattern for (a−b)⁶</div><div class="step-formula">$$(a-b)^6=a^6-6a^5b+15a^4b^2-20a^3b^3+15a^2b^4-6ab^5+b^6$$</div></div></div>
+        <div class="step"><div class="step-badge purple">3</div><div class="step-content"><div class="step-label">определите a и b · identify a = 2x, b = 1</div><div class="step-formula">$$a=2x,\quad b=1$$</div></div></div>
+        <div class="step"><div class="step-badge purple">4</div><div class="step-content"><div class="step-label">подставьте · substitute a and b</div><div class="step-formula">$$(2x-1)^6=(2x)^6-6(2x)^5(1)+15(2x)^4(1)-20(2x)^3(1)+15(2x)^2(1)-6(2x)(1)+1$$</div></div></div>
+        <div class="step"><div class="step-badge purple">5</div><div class="step-content"><div class="step-label">упростите каждый член · simplify each power of 2x</div><div class="step-formula">$$=64x^6-192x^5+240x^4-160x^3+60x^2-12x+1$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">64x⁶−192x⁵+240x⁴−160x³+60x²−12x+1</span></div>
+    </div>
+  </div>
+
+  <!-- ================= HOMEWORK ================= -->
+  <section class="card">
+    <div class="section-label">домашняя работа · homework</div>
+    <h2 class="section-title serif">15 задач для самопроверки</h2>
+    <p class="section-sub">1–10 — нахождение комбинаций (finding combinations); 11–15 — разложение по биному Ньютона (binomial expansion).</p>
+  </section>
+
+  <div class="hw-grid" id="hwGrid"></div>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="card">
+    <div class="section-label">тест · self-check quiz</div>
+    <h2 class="section-title serif">5 вопросов по теории</h2>
+    <p class="section-sub">Выберите один вариант ответа для каждого вопроса. Choose one option per question.</p>
+
+    <div id="quizContainer"></div>
+
+    <button id="quizSubmit">Проверить тест · Check quiz</button>
+    <button id="quizReset">Сбросить · Reset</button>
+    <div id="quizResult"></div>
+  </section>
+
+  <footer>The Binomial Expansion &amp; Combinations · self-study revision page</footer>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+
+  // ---------------- HOMEWORK DATA ----------------
+  const hwData = [
+    {tag:"combo", section:"Комбинации · Finding Combinations", given:"4!"},
+    {tag:"combo", given:"9!"},
+    {tag:"combo", given:"\\dfrac{10!}{7!}"},
+    {tag:"combo", given:"\\dfrac{15!}{13!}"},
+    {tag:"combo", given:"\\binom{4}{2}"},
+    {tag:"combo", given:"\\binom{6}{4}"},
+    {tag:"combo", given:"{}^6C_3"},
+    {tag:"combo", given:"\\binom{5}{4}"},
+    {tag:"combo", given:"{}^{10}C_8"},
+    {tag:"combo", given:"\\binom{9}{5}"},
+
+    {tag:"expand", section:"Разложение · Binomial Expansion", given:"(x+5)^4", ask:"Expand using the binomial theorem."},
+    {tag:"expand", given:"(2-b)^5", ask:"Expand using the binomial theorem."},
+    {tag:"expand", given:"(4x+y)^4", ask:"Expand using the binomial theorem."},
+    {tag:"expand", given:"(x-3y)^3", ask:"Expand using the binomial theorem."},
+    {tag:"expand", given:"(3x+4y)^5", ask:"Expand using the binomial theorem."},
+  ];
+
+  const hwGrid = document.getElementById('hwGrid');
+  const tagMeta = {
+    combo:  {cls:'tag-combo',  label:'combinations'},
+    expand: {cls:'tag-expand', label:'expansion'},
+  };
+  let problemNumber = 0;
+  hwData.forEach((item) => {
+    if(item.section){
+      const header = document.createElement('div');
+      header.className = 'hw-section-header';
+      header.textContent = item.section;
+      hwGrid.appendChild(header);
+    }
+    problemNumber++;
+    const card = document.createElement('div');
+    card.className = 'hw-card';
+    const meta = tagMeta[item.tag] || tagMeta.combo;
+    const askLine = item.ask ? `<div style="font-size:13px;color:var(--muted);">${item.ask}</div>` : `<div style="font-size:13px;color:var(--muted);">Work out the value.</div>`;
+    card.innerHTML = `
+      <div class="hw-num">
+        <span class="hw-num-label">Задача ${problemNumber} · Problem ${problemNumber}</span>
+        <span class="tag ${meta.cls}">${meta.label}</span>
+      </div>
+      <div class="hw-problem">$${item.given}$</div>
+      ${askLine}
+    `;
+    hwGrid.appendChild(card);
+  });
+
+  // ---------------- QUIZ DATA ----------------
+  const quizData = [
+    {
+      question: "Что такое «binomial expression»? / What is a binomial expression?",
+      options: ["Выражение с одним слагаемым (one term)", "Выражение с двумя слагаемыми (two terms)", "Уравнение второй степени (a quadratic equation)", "Дробь (a fraction)"],
+      correct: 1
+    },
+    {
+      question: "Чему равно ⁿCᵣ по формуле? / What is the formula for nCr?",
+      options: ["n! × r!", "n! / (r!(n−r)!)", "(n−r)! / n!", "n / r"],
+      correct: 1
+    },
+    {
+      question: "В треугольнике Паскаля каждое число получается как... / In Pascal's triangle, each number is:",
+      options: ["Произведение двух чисел над ним (the product of the two numbers above)", "Сумма двух чисел над ним (the sum of the two numbers above)", "Разность соседних чисел в строке (the difference of neighbours in the row)", "Всегда равно 1"],
+      correct: 1
+    },
+    {
+      question: "Чему равно 4!? / What is 4! (4 factorial)?",
+      options: ["4", "16", "24", "10"],
+      correct: 2
+    },
+    {
+      question: "В разложении (1+x)ⁿ, каков коэффициент при x⁰? / In the expansion of (1+x)ⁿ, what is the coefficient of x⁰?",
+      options: ["(n choose n)", "(n choose 0)", "0", "n"],
+      correct: 1
+    }
+  ];
+
+  const quizContainer = document.getElementById('quizContainer');
+  quizData.forEach((q, qi) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'quiz-q';
+    let optsHtml = '';
+    q.options.forEach((opt, oi) => {
+      optsHtml += `<div class="quiz-option" data-q="${qi}" data-o="${oi}">${opt}</div>`;
+    });
+    qDiv.innerHTML = `<div class="qtext">${qi+1}. ${q.question}</div><div class="quiz-options">${optsHtml}</div>`;
+    quizContainer.appendChild(qDiv);
+  });
+
+  const selected = {};
+  quizContainer.addEventListener('click', function(e){
+    const opt = e.target.closest('.quiz-option');
+    if(!opt) return;
+    const qi = opt.getAttribute('data-q');
+    const siblings = quizContainer.querySelectorAll(`.quiz-option[data-q="${qi}"]`);
+    siblings.forEach(s => s.classList.remove('selected'));
+    opt.classList.add('selected');
+    selected[qi] = opt.getAttribute('data-o');
+  });
+
+  document.getElementById('quizSubmit').addEventListener('click', function(){
+    let score = 0;
+    quizData.forEach((q, qi) => {
+      const siblings = quizContainer.querySelectorAll(`.quiz-option[data-q="${qi}"]`);
+      siblings.forEach(s => {
+        const oi = s.getAttribute('data-o');
+        if(parseInt(oi) === q.correct){ s.classList.add('correct'); }
+        else if(selected[qi] !== undefined && parseInt(oi) === parseInt(selected[qi])){ s.classList.add('wrong'); }
+      });
+      if(selected[qi] !== undefined && parseInt(selected[qi]) === q.correct) score++;
+    });
+    document.getElementById('quizResult').textContent = `Результат · Score: ${score} / ${quizData.length}`;
+  });
+
+  document.getElementById('quizReset').addEventListener('click', function(){
+    quizContainer.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected','correct','wrong'));
+    document.getElementById('quizResult').textContent = '';
+    for(const k in selected) delete selected[k];
+  });
+</script>
+</body>
+</html>
