@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Синтетическое деление многочленов</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+<style>
+  :root{
+    --bg:#f7f4f0;
+    --card:#ffffff;
+    --pink:#e84fa3;
+    --purple:#7c5cbf;
+    --pink-light:#fde8f4;
+    --pink-mid:#f9c9e8;
+    --purple-light:#ede8f8;
+    --ink:#1a1228;
+    --muted:#7a6e82;
+    --border:#e5dff0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    padding:48px 24px;
+    line-height:1.55;
+  }
+  .page{ max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:28px; }
+  h1,h2,h3,.serif{ font-family:'DM Serif Display', serif; font-weight:400; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  .card{ background:var(--card); border-radius:20px; border:1.5px solid var(--border); padding:28px; }
+
+  /* ---------- Header ---------- */
+  .header{ position:relative; overflow:hidden; background:var(--ink); border-radius:24px; padding:44px 32px; color:#f7f4f0; }
+  .header .blob{ position:absolute; border-radius:50%; filter:blur(50px); opacity:0.55; z-index:0; }
+  .header .blob1{ width:260px; height:260px; background:var(--pink); top:-100px; right:-60px;}
+  .header .blob2{ width:220px; height:220px; background:var(--purple); bottom:-90px; left:-60px;}
+  .header-content{ position:relative; z-index:1; }
+  .badge{ position:absolute; top:0; right:0; background:var(--pink); color:#fff; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:7px 14px; border-radius:20px; font-weight:600; z-index:2; }
+  .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.12em; color:var(--pink-mid); margin:0 0 14px 0; }
+  .header h1{ font-size:31px; margin:0 0 6px 0; line-height:1.18; color:#fff; }
+  .header .subtitle{ font-family:'JetBrains Mono', monospace; font-size:14px; color:#cfc3e0; margin:0 0 20px 0; }
+  .meta-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+  .meta-pill{ font-family:'JetBrains Mono', monospace; font-size:11.5px; padding:6px 12px; border-radius:20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#e9e2f4; }
+
+  /* ---------- Section labels ---------- */
+  .section-label{ display:flex; align-items:center; gap:12px; font-family:'JetBrains Mono', monospace; font-size:12.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:4px; }
+  .section-label::before{ content:""; display:inline-block; width:24px; height:3px; background:var(--pink); border-radius:2px; }
+  .section-title{ font-size:26px; margin:2px 0 6px 0; }
+  .section-sub{ color:var(--muted); font-size:15px; margin:0 0 8px 0; }
+
+  .divider{ height:2px; border:none; background:linear-gradient(90deg, var(--pink), var(--purple)); opacity:0.25; margin:4px 0; }
+
+  /* ---------- Theory ---------- */
+  .theory-block{ display:flex; flex-direction:column; gap:16px; }
+  .formula-box{ background:rgba(255,255,255,0.6); border:1.5px solid var(--border); border-radius:16px; padding:20px 22px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:17px; overflow-x:auto; }
+  .formula-box.pink{ background:var(--pink-light); }
+  .formula-box.purple{ background:var(--purple-light); }
+  .rule-callout{ background:var(--pink-light); border-left:4px solid var(--pink); border-radius:12px; padding:16px 20px; font-size:15px; }
+  .rule-callout b{ color:var(--pink); }
+  .note-box{ background:var(--purple-light); border-left:4px solid var(--purple); border-radius:12px; padding:14px 18px; font-size:13.5px; color:var(--ink); }
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .algo-list{ display:flex; flex-direction:column; gap:10px; margin:0; padding:0; list-style:none; }
+  .algo-list li{ display:flex; gap:12px; align-items:flex-start; font-size:14.5px; }
+  .algo-num{ flex:none; width:26px; height:26px; border-radius:50%; background:var(--purple-light); color:var(--purple); font-family:'JetBrains Mono', monospace; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:12.5px; }
+  .kw-pill-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .kw-pill{ font-family:'JetBrains Mono', monospace; font-size:12px; background:var(--purple-light); color:var(--purple); padding:5px 12px; border-radius:20px; font-weight:600; }
+
+  /* Synthetic division table */
+  .syn-table{ overflow-x:auto; }
+  table.syn{ border-collapse:collapse; font-family:'JetBrains Mono', monospace; font-size:15px; margin:0 auto; }
+  table.syn td{ padding:8px 14px; text-align:center; min-width:44px; }
+  table.syn tr.syn-root td:first-child{ font-weight:700; color:var(--purple); border-right:1.5px solid var(--ink); }
+  table.syn tr.syn-line td{ border-bottom:1.5px solid var(--ink); }
+  table.syn tr.syn-result td{ font-weight:700; }
+  table.syn tr.syn-mult td{ color:var(--pink); font-size:13px; }
+
+  /* Computed synthetic-division table for worked examples */
+  .synth-wrap{ display:flex; justify-content:center; margin:4px 0; overflow-x:auto; }
+  table.synth{ border-collapse:collapse; font-family:'JetBrains Mono', monospace; font-size:15.5px; }
+  table.synth td{ padding:7px 13px; text-align:center; min-width:38px; }
+  table.synth td.synth-root{ font-weight:700; color:var(--purple); border-right:1.5px solid var(--ink); }
+  table.synth tr.synth-coeffs td{ border-bottom:1.5px solid var(--ink); font-weight:700; }
+  table.synth tr.synth-prod td{ color:var(--pink); font-size:13px; }
+  table.synth tr.synth-result td{ font-weight:700; }
+  table.synth tr.synth-result td.synth-rem{ background:var(--pink-light); border:1.5px solid var(--pink); border-radius:8px; color:var(--pink); }
+
+  /* ---------- Tags ---------- */
+  .tag{ display:inline-block; font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; padding:4px 12px; border-radius:20px; font-weight:600; }
+  .tag-basic{ background:#e3f5e9; color:#1c8a4c; }
+  .tag-missing{ background:var(--purple-light); color:var(--purple); }
+  .tag-nonmonic{ background:#fde3d0; color:#c65e17; }
+  .tag-factor{ background:var(--pink-light); color:var(--pink); }
+
+  /* ---------- Worked examples ---------- */
+  .example-card{ border-radius:20px; overflow:hidden; border:1.5px solid var(--border); background:var(--card); }
+  .example-header{ background:linear-gradient(135deg,#1e0e35,#3a1f6e); color:#fff; padding:18px 22px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .example-header .ex-title{ font-family:'DM Serif Display', serif; font-size:20px; }
+  .given-badge{ font-family:'JetBrains Mono', monospace; background:var(--pink); color:#fff; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; white-space:nowrap; }
+  .example-body{ padding:22px; display:flex; flex-direction:column; gap:16px; }
+  .steps{ display:flex; flex-direction:column; gap:12px; }
+  .step{ display:flex; gap:14px; align-items:flex-start; }
+  .step-badge{ flex:none; width:30px; height:30px; border-radius:50%; background:var(--pink-light); color:var(--pink); font-family:'JetBrains Mono', monospace; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .step-badge.purple{ background:var(--purple-light); color:var(--purple); }
+  .step-content{ flex:1; min-width:0; }
+  .step-label{ font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:3px; }
+  .step-formula{ font-family:'JetBrains Mono', monospace; font-size:15px; overflow-x:auto; }
+  .answer-row{ background:var(--pink-light); border-radius:12px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-family:'JetBrains Mono', monospace; font-weight:600; font-size:15px; }
+  .answer-row .val{ color:var(--pink); font-size:16px; }
+
+  /* ---------- Homework grid ---------- */
+  .hw-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .hw-card{ border-radius:16px; border:1.5px solid var(--border); background:var(--card); padding:14px 16px; display:flex; flex-direction:column; gap:8px; }
+  .hw-num-label{ font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+  .hw-problem{ font-family:'JetBrains Mono', monospace; font-size:14.5px; overflow-x:auto; min-height:22px; }
+
+  .hw-section-header{
+    grid-column: 1 / -1;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--purple);
+    font-weight:700;
+    padding:14px 4px 2px 4px;
+    border-top:2px dashed var(--border);
+    margin-top:6px;
+  }
+  .hw-section-header:first-child{ border-top:none; margin-top:0; padding-top:0; }
+
+  /* ---------- Quiz ---------- */
+  .quiz-q{ border:1.5px solid var(--border); border-radius:16px; padding:18px; margin-bottom:16px; background:var(--card); }
+  .quiz-q .qtext{ font-weight:600; margin-bottom:12px; font-size:15px; }
+  .quiz-options{ display:flex; flex-direction:column; gap:8px; }
+  .quiz-option{ display:flex; align-items:center; gap:10px; border:1.5px solid var(--border); border-radius:12px; padding:10px 14px; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:13.5px; transition:background 0.15s, border-color 0.15s; }
+  .quiz-option:hover{ background:var(--pink-light); }
+  .quiz-option.selected{ border-color:var(--purple); background:var(--purple-light); }
+  .quiz-option.correct{ border-color:#1c8a4c; background:#e3f5e9; }
+  .quiz-option.wrong{ border-color:#c0367a; background:#fde3ec; }
+  #quizSubmit, #quizReset{ border:none; background:var(--pink); color:#fff; font-family:'JetBrains Mono', monospace; font-weight:600; font-size:14px; padding:12px 22px; border-radius:14px; cursor:pointer; margin-right:10px; }
+  #quizReset{ background:var(--purple); }
+  #quizResult{ font-family:'JetBrains Mono', monospace; font-size:16px; font-weight:600; margin-top:14px; }
+
+  footer{ text-align:center; color:var(--muted); font-family:'JetBrains Mono', monospace; font-size:12px; padding:12px 0 4px 0; }
+
+  @media (max-width:640px){
+    body{ padding:28px 14px; }
+    .two-col, .hw-grid{ grid-template-columns:1fr; }
+    .header h1{ font-size:23px; }
+    .badge{ position:static; display:inline-block; margin-bottom:14px; }
+    .header .header-content{ display:flex; flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ================= HEADER ================= -->
+  <header class="header">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <span class="badge">algebra · polynomials</span>
+    <div class="header-content">
+      <p class="eyebrow">Section 1.1 · Synthetic Division</p>
+      <h1>Синтетическое деление многочленов</h1>
+      <p class="subtitle">Polynomial Expressions &amp; Synthetic Division</p>
+      <div class="meta-row">
+        <span class="meta-pill">уровень · standard</span>
+        <span class="meta-pill">⏱ 30–35 min self-study</span>
+        <span class="meta-pill">5 worked examples</span>
+        <span class="meta-pill">6 practice · 5 quiz</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= THEORY 1: POLYNOMIAL EXPRESSIONS ================= -->
+  <section class="card theory-block">
+    <div class="section-label">теория · theory</div>
+    <h2 class="section-title serif">Многочлены (Polynomial Expressions)</h2>
+    <p class="section-sub">Section 1.1 — базовые понятия перед синтетическим делением.</p>
+
+    <div class="kw-pill-row">
+      <span class="kw-pill">polynomial</span><span class="kw-pill">degree</span><span class="kw-pill">coefficient</span>
+      <span class="kw-pill">term</span><span class="kw-pill">constant term</span><span class="kw-pill">binomial</span><span class="kw-pill">trinomial</span>
+    </div>
+
+    <p><b>Многочлен (polynomial)</b> — это сумма нескольких алгебраических слагаемых (terms) с целыми положительными степенями переменной. Например:</p>
+
+    <div class="formula-box pink">$$5x^3-3x^2+4x-6$$</div>
+
+    <p style="font-size:14.5px;">Это выражение состоит из <b>четырёх членов (terms)</b>: <span class="mono">5x³, −3x², 4x</span> и <span class="mono">−6</span>.</p>
+
+    <div class="note-box">
+      <b>Степень (degree)</b> многочлена — это наибольшая степень x. Линейный (linear) — degree 1; квадратичный (quadratic) — degree 2; кубический (cubic) — degree 3.<br>
+      <b>Коэффициент (coefficient)</b> — число перед степенью x. В <span class="mono">4x³−2x²+5x−6</span>: коэффициент при x³ равен 4, при x² равен −2, при x равен 5, а −6 — это <b>constant term</b> (свободный член).
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ================= THEORY 2: SYNTHETIC DIVISION ================= -->
+  <section class="card theory-block">
+    <div class="section-label">теория · theory</div>
+    <h2 class="section-title serif">Синтетическое деление</h2>
+    <p class="section-sub">Synthetic Division — быстрый способ разделить многочлен на (x−c) без «деления столбиком».</p>
+
+    <p>Синтетическое деление работает, когда мы делим многочлен на двучлен вида <span class="mono">(x−c)</span>. Результат:</p>
+
+    <div class="formula-box">
+      $$P(x) = (x-c)\cdot Q(x) + r \qquad\Longleftrightarrow\qquad \frac{P(x)}{x-c}=Q(x)+\frac{r}{x-c}$$
+    </div>
+
+    <p style="font-size:14.5px;">где <span class="mono">Q(x)</span> — частное (quotient, степень на 1 меньше), а <span class="mono">r</span> — остаток (remainder, число).</p>
+
+    <div class="algo-list">
+      <li><span class="algo-num">1</span><span>Найдите <b>корень c</b> из <span class="mono">x−c=0</span>. Например, для (x+1): x=−1; для (x−4): x=4.</span></li>
+      <li><span class="algo-num">2</span><span>Выпишите <b>все коэффициенты</b> делимого по убыванию степени, <b>не забывая нули</b> для пропущенных степеней (missing terms get a 0).</span></li>
+      <li><span class="algo-num">3</span><span><b>Снесите</b> первый коэффициент вниз без изменений (bring down the leading coefficient).</span></li>
+      <li><span class="algo-num">4</span><span><b>Умножьте</b> его на c, прибавьте результат к следующему коэффициенту. Повторяйте для всех коэффициентов.</span></li>
+      <li><span class="algo-num">5</span><span>Последнее число внизу — это <b>остаток</b> (remainder); остальные — коэффициенты частного <span class="mono">Q(x)</span>, степень которого на 1 меньше исходной.</span></li>
+    </div>
+
+    <p style="font-size:14.5px;">Пример схемы (the layout):</p>
+
+    <div class="syn-table">
+      <table class="syn">
+        <tr class="syn-root"><td>c</td><td>a₃</td><td>a₂</td><td>a₁</td><td>a₀</td></tr>
+        <tr class="syn-mult"><td></td><td></td><td>↓×c</td><td>↓×c</td><td>↓×c</td></tr>
+        <tr class="syn-line"><td></td><td>a₃</td><td>b₂</td><td>b₁</td><td><b>r</b></td></tr>
+      </table>
+    </div>
+
+    <div class="rule-callout"><b>Если делитель не (x−c), а (ax+b):</b> вынесите a за скобку — (ax+b)=a(x+b/a) — используйте корень c=−b/a, а затем разделите получившееся частное на a (remainder не меняется).</div>
+
+    <div class="note-box"><b>Remainder Theorem (теорема об остатке):</b> остаток от деления P(x) на (x−c) всегда равен <span class="mono">P(c)</span> — значению многочлена в точке c. Это удобный способ проверить ответ!</div>
+  </section>
+
+  <!-- ================= WORKED EXAMPLES ================= -->
+  <section>
+    <div class="section-label">примеры · worked examples</div>
+    <h2 class="section-title serif">5 разобранных примеров</h2>
+    <p class="section-sub">Примеры 1–3 — с урока (те же числа); примеры 4–5 — точное деление и связь с factor theorem.</p>
+  </section>
+
+  <!-- WE1 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 1 · Example 1</span>
+      <span class="given-badge">$(x^3{+}3x^2{+}5x{+}3)\div(x{+}1)$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-basic">basic · с урока</div>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">найдите корень · x+1=0 ⟹ x=−1</div><div class="step-formula">c = −1</div></div></div>
+      </div>
+      <div class="synth-wrap">
+        <table class="synth">
+          <tr><td class="synth-root" rowspan="3">−1</td><td>1</td><td>3</td><td>5</td><td>3</td></tr>
+          <tr class="synth-prod"><td></td><td>−1</td><td>−2</td><td>−3</td></tr>
+          <tr class="synth-result"><td>1</td><td>2</td><td>3</td><td class="synth-rem">0</td></tr>
+        </table>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">читаем результат · read off the quotient + remainder</div><div class="step-formula">1, 2, 3 → x²+2x+3; последнее число 0 → remainder</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">x²+2x+3, остаток 0</span></div>
+    </div>
+  </div>
+
+  <!-- WE2 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 2 · Example 2</span>
+      <span class="given-badge">$(7x^3{+}6x{-}8)\div(x{-}4)$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-missing">missing term · пропущен x²</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">В делимом нет члена x² — ставим коэффициент 0!</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">найдите корень · x−4=0 ⟹ x=4</div><div class="step-formula">c = 4</div></div></div>
+      </div>
+      <div class="synth-wrap">
+        <table class="synth">
+          <tr><td class="synth-root" rowspan="3">4</td><td>7</td><td>0</td><td>6</td><td>−8</td></tr>
+          <tr class="synth-prod"><td></td><td>28</td><td>112</td><td>472</td></tr>
+          <tr class="synth-result"><td>7</td><td>28</td><td>118</td><td class="synth-rem">464</td></tr>
+        </table>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">читаем результат · read off the quotient + remainder</div><div class="step-formula">7, 28, 118 → 7x²+28x+118; последнее число 464 → remainder</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">7x²+28x+118 + 464/(x−4)</span></div>
+    </div>
+  </div>
+
+  <!-- WE3 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 3 · Example 3</span>
+      <span class="given-badge">$(3x^4{-}5x^2{+}6)\div(x{-}2)$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-missing">missing terms · пропущены x³ и x</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Здесь пропущены сразу два члена: x³ и x — ставим два нуля.</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">найдите корень · x−2=0 ⟹ x=2</div><div class="step-formula">c = 2</div></div></div>
+      </div>
+      <div class="synth-wrap">
+        <table class="synth">
+          <tr><td class="synth-root" rowspan="3">2</td><td>3</td><td>0</td><td>−5</td><td>0</td><td>6</td></tr>
+          <tr class="synth-prod"><td></td><td>6</td><td>12</td><td>14</td><td>28</td></tr>
+          <tr class="synth-result"><td>3</td><td>6</td><td>7</td><td>14</td><td class="synth-rem">34</td></tr>
+        </table>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">читаем результат · read off the quotient + remainder</div><div class="step-formula">3, 6, 7, 14 → 3x³+6x²+7x+14; последнее число 34 → remainder</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">3x³+6x²+7x+14 + 34/(x−2)</span></div>
+    </div>
+  </div>
+
+  <!-- WE4 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 4 · Example 4</span>
+      <span class="given-badge">$(x^2{+}5x{+}6)\div(x{+}3)$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-basic">basic · точное деление</div>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">корень: x+3=0 ⟹ x=−3</div><div class="step-formula">c = −3</div></div></div>
+      </div>
+      <div class="synth-wrap">
+        <table class="synth">
+          <tr><td class="synth-root" rowspan="3">−3</td><td>1</td><td>5</td><td>6</td></tr>
+          <tr class="synth-prod"><td></td><td>−3</td><td>−6</td></tr>
+          <tr class="synth-result"><td>1</td><td>2</td><td class="synth-rem">0</td></tr>
+        </table>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">x+2, остаток 0 (делится нацело!)</span></div>
+    </div>
+  </div>
+
+  <!-- WE6 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 5 · Example 5</span>
+      <span class="given-badge">$(x^3{+}3x^2{-}10x{-}24)\div(x{-}3)$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-factor">factor theorem · остаток 0</div>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">корень: x−3=0 ⟹ x=3</div><div class="step-formula">c = 3</div></div></div>
+      </div>
+      <div class="synth-wrap">
+        <table class="synth">
+          <tr><td class="synth-root" rowspan="3">3</td><td>1</td><td>3</td><td>−10</td><td>−24</td></tr>
+          <tr class="synth-prod"><td></td><td>3</td><td>18</td><td>24</td></tr>
+          <tr class="synth-result"><td>1</td><td>6</td><td>8</td><td class="synth-rem">0</td></tr>
+        </table>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">x²+6x+8, остаток 0</span></div>
+    </div>
+  </div>
+
+  <!-- ================= HOMEWORK ================= -->
+  <section class="card">
+    <div class="section-label">домашняя работа · homework</div>
+    <h2 class="section-title serif">6 задач для самопроверки</h2>
+    <p class="section-sub">Только задачи, отмеченные синим кружком на фото: №3, 6, 7, 14, 17, 22.</p>
+  </section>
+
+  <div class="hw-grid" id="hwGrid"></div>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="card">
+    <div class="section-label">тест · self-check quiz</div>
+    <h2 class="section-title serif">5 вопросов по теории</h2>
+    <p class="section-sub">Выберите один вариант ответа для каждого вопроса. Choose one option per question.</p>
+
+    <div id="quizContainer"></div>
+
+    <button id="quizSubmit">Проверить тест · Check quiz</button>
+    <button id="quizReset">Сбросить · Reset</button>
+    <div id="quizResult"></div>
+  </section>
+
+  <footer>Synthetic Division of Polynomials · self-study revision page</footer>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+
+  // ---------------- HOMEWORK DATA (only the blue-circled problems) ----------------
+  const hwData = [
+    {n:3, given:"(x^2+9x+14)\\div(x+2)"},
+    {n:6, given:"(2x^2+x-10)\\div(2x+5)"},
+    {n:7, given:"\\dfrac{6x^2-10x-4}{3x+1}"},
+    {n:14, given:"(x^3+5x^2+11x+10)\\div(x+2)"},
+    {n:17, given:"\\dfrac{2x^3-x^2-7x+6}{2x-3}"},
+    {n:22, given:"(4x^3-11x+3)\\div(2x-3)"},
+  ];
+
+  const hwGrid = document.getElementById('hwGrid');
+  hwData.forEach((item) => {
+    if(item.section){
+      const header = document.createElement('div');
+      header.className = 'hw-section-header';
+      header.textContent = item.section;
+      hwGrid.appendChild(header);
+    }
+    const card = document.createElement('div');
+    card.className = 'hw-card';
+    card.innerHTML = `
+      <span class="hw-num-label">Задача ${item.n} · Problem ${item.n}</span>
+      <div class="hw-problem">$${item.given}$</div>
+    `;
+    hwGrid.appendChild(card);
+  });
+
+  // ---------------- QUIZ DATA ----------------
+  const quizData = [
+    {
+      question: "Что определяет степень (degree) многочлена? / What determines the degree of a polynomial?",
+      options: ["Количество членов (number of terms)", "Наибольшая степень x (the highest power of x)", "Значение свободного члена (the value of the constant term)", "Сумма всех коэффициентов"],
+      correct: 1
+    },
+    {
+      question: "Синтетическое деление применяется, когда делитель имеет вид... / Synthetic division works when the divisor is of the form:",
+      options: ["x²+bx+c", "(x−c)", "любой многочлен (any polynomial)", "ax²+bx+c"],
+      correct: 1
+    },
+    {
+      question: "Что нужно сделать, если в многочлене пропущена степень (например, нет x²)? / What must you do if a power is missing (e.g. no x² term)?",
+      options: ["Пропустить эту колонку (skip that column)", "Поставить коэффициент 0 (write a coefficient of 0)", "Остановить деление (stop the division)", "Заменить на x"],
+      correct: 1
+    },
+    {
+      question: "По теореме об остатке (Remainder Theorem), остаток от деления P(x) на (x−c) равен... / The remainder when dividing P(x) by (x−c) equals:",
+      options: ["P(0)", "P(c)", "c", "P(x)/c"],
+      correct: 1
+    },
+    {
+      question: "Если делитель имеет вид (ax+b) с a≠1, что нужно сделать после синтетического деления? / If the divisor is (ax+b) with a≠1, what must you do after synthetic division?",
+      options: ["Ничего, ответ уже готов", "Разделить получившееся частное на a (divide the resulting quotient by a)", "Умножить остаток на a", "Заменить корень на −c"],
+      correct: 1
+    }
+  ];
+
+  const quizContainer = document.getElementById('quizContainer');
+
+  function shuffleOptions(q){
+    const indexed = q.options.map((opt, i) => ({opt, isCorrect: i === q.correct}));
+    for(let i = indexed.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+    }
+    return {
+      question: q.question,
+      options: indexed.map(x => x.opt),
+      correct: indexed.findIndex(x => x.isCorrect)
+    };
+  }
+
+  const shuffledQuizData = quizData.map(shuffleOptions);
+
+  shuffledQuizData.forEach((q, qi) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'quiz-q';
+    let optsHtml = '';
+    q.options.forEach((opt, oi) => {
+      optsHtml += `<div class="quiz-option" data-q="${qi}" data-o="${oi}">${opt}</div>`;
+    });
+    qDiv.innerHTML = `<div class="qtext">${qi+1}. ${q.question}</div><div class="quiz-options">${optsHtml}</div>`;
+    quizContainer.appendChild(qDiv);
+  });
+
+  const selected = {};
+  quizContainer.addEventListener('click', function(e){
+    const opt = e.target.closest('.quiz-option');
+    if(!opt) return;
+    const qi = opt.getAttribute('data-q');
+    const siblings = quizContainer.querySelectorAll(`.quiz-option[data-q="${qi}"]`);
+    siblings.forEach(s => s.classList.remove('selected'));
+    opt.classList.add('selected');
+    selected[qi] = opt.getAttribute('data-o');
+  });
+
+  document.getElementById('quizSubmit').addEventListener('click', function(){
+    let score = 0;
+    shuffledQuizData.forEach((q, qi) => {
+      const siblings = quizContainer.querySelectorAll(`.quiz-option[data-q="${qi}"]`);
+      siblings.forEach(s => {
+        const oi = s.getAttribute('data-o');
+        if(parseInt(oi) === q.correct){ s.classList.add('correct'); }
+        else if(selected[qi] !== undefined && parseInt(oi) === parseInt(selected[qi])){ s.classList.add('wrong'); }
+      });
+      if(selected[qi] !== undefined && parseInt(selected[qi]) === q.correct) score++;
+    });
+    document.getElementById('quizResult').textContent = `Результат · Score: ${score} / ${shuffledQuizData.length}`;
+  });
+
+  document.getElementById('quizReset').addEventListener('click', function(){
+    quizContainer.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected','correct','wrong'));
+    document.getElementById('quizResult').textContent = '';
+    for(const k in selected) delete selected[k];
+  });
+</script>
+</body>
+</html>
