@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Биномиальное разложение через треугольник Паскаля</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+<style>
+  :root{
+    --bg:#f7f4f0;
+    --card:#ffffff;
+    --pink:#e84fa3;
+    --purple:#7c5cbf;
+    --pink-light:#fde8f4;
+    --pink-mid:#f9c9e8;
+    --purple-light:#ede8f8;
+    --ink:#1a1228;
+    --muted:#7a6e82;
+    --border:#e5dff0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    padding:48px 24px;
+    line-height:1.55;
+  }
+  .page{ max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:28px; }
+  h1,h2,h3,.serif{ font-family:'DM Serif Display', serif; font-weight:400; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  .card{ background:var(--card); border-radius:20px; border:1.5px solid var(--border); padding:28px; }
+
+  /* ---------- Header ---------- */
+  .header{ position:relative; overflow:hidden; background:var(--ink); border-radius:24px; padding:44px 32px; color:#f7f4f0; }
+  .header .blob{ position:absolute; border-radius:50%; filter:blur(50px); opacity:0.55; z-index:0; }
+  .header .blob1{ width:260px; height:260px; background:var(--pink); top:-100px; right:-60px;}
+  .header .blob2{ width:220px; height:220px; background:var(--purple); bottom:-90px; left:-60px;}
+  .header-content{ position:relative; z-index:1; }
+  .badge{ position:absolute; top:0; right:0; background:var(--pink); color:#fff; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:7px 14px; border-radius:20px; font-weight:600; z-index:2; }
+  .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.12em; color:var(--pink-mid); margin:0 0 14px 0; }
+  .header h1{ font-size:29px; margin:0 0 6px 0; line-height:1.18; color:#fff; }
+  .header .subtitle{ font-family:'JetBrains Mono', monospace; font-size:14px; color:#cfc3e0; margin:0 0 20px 0; }
+  .meta-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+  .meta-pill{ font-family:'JetBrains Mono', monospace; font-size:11.5px; padding:6px 12px; border-radius:20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#e9e2f4; }
+
+  /* ---------- Section labels ---------- */
+  .section-label{ display:flex; align-items:center; gap:12px; font-family:'JetBrains Mono', monospace; font-size:12.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:4px; }
+  .section-label::before{ content:""; display:inline-block; width:24px; height:3px; background:var(--pink); border-radius:2px; }
+  .section-title{ font-size:26px; margin:2px 0 6px 0; }
+  .section-sub{ color:var(--muted); font-size:15px; margin:0 0 8px 0; }
+
+  .divider{ height:2px; border:none; background:linear-gradient(90deg, var(--pink), var(--purple)); opacity:0.25; margin:4px 0; }
+
+  /* ---------- Theory ---------- */
+  .theory-block{ display:flex; flex-direction:column; gap:16px; }
+  .formula-box{ background:rgba(255,255,255,0.6); border:1.5px solid var(--border); border-radius:16px; padding:20px 22px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:17px; overflow-x:auto; }
+  .formula-box.pink{ background:var(--pink-light); }
+  .formula-box.purple{ background:var(--purple-light); }
+  .rule-callout{ background:var(--pink-light); border-left:4px solid var(--pink); border-radius:12px; padding:16px 20px; font-size:15px; }
+  .rule-callout b{ color:var(--pink); }
+  .note-box{ background:var(--purple-light); border-left:4px solid var(--purple); border-radius:12px; padding:14px 18px; font-size:13.5px; color:var(--ink); }
+  .algo-list{ display:flex; flex-direction:column; gap:10px; margin:0; padding:0; list-style:none; }
+  .algo-list li{ display:flex; gap:12px; align-items:flex-start; font-size:14.5px; }
+  .algo-num{ flex:none; width:26px; height:26px; border-radius:50%; background:var(--purple-light); color:var(--purple); font-family:'JetBrains Mono', monospace; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:12.5px; }
+
+  /* Pascal's triangle */
+  .pascal{ display:flex; flex-direction:column; align-items:center; gap:8px; font-family:'JetBrains Mono', monospace; font-size:15px; padding:10px 0; }
+  .pascal .prow{ display:flex; align-items:center; gap:12px; }
+  .pascal .prow .n-label{ min-width:56px; text-align:right; color:var(--muted); font-size:12px; }
+  .pascal .prow .vals{ display:flex; gap:14px; }
+  .pascal .prow .vals span{ min-width:20px; text-align:center; color:var(--purple); font-weight:700; }
+  .pascal .prow.next .vals span{ color:var(--pink); }
+
+  /* ---------- Tags ---------- */
+  .tag{ display:inline-block; font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; padding:4px 12px; border-radius:20px; font-weight:600; }
+  .tag-basic{ background:#e3f5e9; color:#1c8a4c; }
+  .tag-sub{ background:var(--purple-light); color:var(--purple); }
+  .tag-coeff{ background:#fde3d0; color:#c65e17; }
+  .tag-two{ background:var(--pink-light); color:var(--pink); }
+
+  /* ---------- Worked examples ---------- */
+  .example-card{ border-radius:20px; overflow:hidden; border:1.5px solid var(--border); background:var(--card); }
+  .example-header{ background:linear-gradient(135deg,#1e0e35,#3a1f6e); color:#fff; padding:18px 22px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .example-header .ex-title{ font-family:'DM Serif Display', serif; font-size:20px; }
+  .given-badge{ font-family:'JetBrains Mono', monospace; background:var(--pink); color:#fff; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; white-space:nowrap; }
+  .example-body{ padding:22px; display:flex; flex-direction:column; gap:16px; }
+  .steps{ display:flex; flex-direction:column; gap:12px; }
+  .step{ display:flex; gap:14px; align-items:flex-start; }
+  .step-badge{ flex:none; width:30px; height:30px; border-radius:50%; background:var(--pink-light); color:var(--pink); font-family:'JetBrains Mono', monospace; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .step-badge.purple{ background:var(--purple-light); color:var(--purple); }
+  .step-content{ flex:1; min-width:0; }
+  .step-label{ font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:3px; }
+  .step-formula{ font-family:'JetBrains Mono', monospace; font-size:14.5px; overflow-x:auto; }
+  .answer-row{ background:var(--pink-light); border-radius:12px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-family:'JetBrains Mono', monospace; font-weight:600; font-size:14.5px; }
+  .answer-row .val{ color:var(--pink); font-size:15.5px; }
+
+  /* ---------- Homework grid ---------- */
+  .hw-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .hw-card{ border-radius:18px; border:1.5px solid var(--border); background:var(--card); padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .hw-num-label{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+  .hw-problem{ font-family:'JetBrains Mono', monospace; font-size:17px; overflow-x:auto; min-height:24px; }
+
+  /* ---------- Quiz ---------- */
+  .quiz-q{ border:1.5px solid var(--border); border-radius:16px; padding:18px; margin-bottom:16px; background:var(--card); }
+  .quiz-q .qtext{ font-weight:600; margin-bottom:12px; font-size:15px; }
+  .quiz-options{ display:flex; flex-direction:column; gap:8px; }
+  .quiz-option{ display:flex; align-items:center; gap:10px; border:1.5px solid var(--border); border-radius:12px; padding:10px 14px; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:13.5px; transition:background 0.15s, border-color 0.15s; }
+  .quiz-option:hover{ background:var(--pink-light); }
+  .quiz-option.selected{ border-color:var(--purple); background:var(--purple-light); }
+  .quiz-option.correct{ border-color:#1c8a4c; background:#e3f5e9; }
+  .quiz-option.wrong{ border-color:#c0367a; background:#fde3ec; }
+  #quizSubmit, #quizReset{ border:none; background:var(--pink); color:#fff; font-family:'JetBrains Mono', monospace; font-weight:600; font-size:14px; padding:12px 22px; border-radius:14px; cursor:pointer; margin-right:10px; }
+  #quizReset{ background:var(--purple); }
+  #quizResult{ font-family:'JetBrains Mono', monospace; font-size:16px; font-weight:600; margin-top:14px; }
+
+  footer{ text-align:center; color:var(--muted); font-family:'JetBrains Mono', monospace; font-size:12px; padding:12px 0 4px 0; }
+
+  @media (max-width:640px){
+    body{ padding:28px 14px; }
+    .hw-grid{ grid-template-columns:1fr; }
+    .header h1{ font-size:21px; }
+    .badge{ position:static; display:inline-block; margin-bottom:14px; }
+    .header .header-content{ display:flex; flex-direction:column; }
+    .pascal .prow{ gap:6px; }
+    .pascal .prow .vals{ gap:8px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ================= HEADER ================= -->
+  <header class="header">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <span class="badge">algebra · binomial expansion</span>
+    <div class="header-content">
+      <p class="eyebrow">Section 6.1 · Binomial Expansion of (a+b)ⁿ</p>
+      <h1>Биномиальное разложение через треугольник Паскаля</h1>
+      <p class="subtitle">Binomial Expansion of (a+b)ⁿ using Pascal's Triangle</p>
+      <div class="meta-row">
+        <span class="meta-pill">уровень · standard</span>
+        <span class="meta-pill">⏱ 25–30 min self-study</span>
+        <span class="meta-pill">8 worked examples</span>
+        <span class="meta-pill">5 practice · 5 quiz</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= THEORY 1: WHERE THE PATTERN COMES FROM ================= -->
+  <section class="card theory-block">
+    <div class="section-label">теория · theory</div>
+    <h2 class="section-title serif">Что такое binomial</h2>
+    <p class="section-sub">Binomial means «two terms» — biномиальное выражение состоит из двух слагаемых.</p>
+
+    <p>Слово <b>binomial</b> используется в алгебре для выражений вида <span class="mono">x+3</span> или <span class="mono">5x−2y</span>. Вы уже знаете, что:</p>
+
+    <div class="formula-box pink">$$(a+b)^2=a^2+2ab+b^2$$</div>
+
+    <p>Разложение <span class="mono">(a+b)²</span> можно использовать, чтобы разложить <span class="mono">(a+b)³</span>:</p>
+
+    <div class="formula-box">
+      $$(a+b)^3=(a+b)(a^2+2ab+b^2)=a^3+2a^2b+ab^2+a^2b+2ab^2+b^3=a^3+3a^2b+3ab^2+b^3$$
+    </div>
+
+    <p style="font-size:14.5px;">Аналогично можно показать, что <span class="mono">(a+b)⁴ = a⁴+4a³b+6a²b²+4ab³+b⁴</span>.</p>
+
+    <div class="note-box">
+      Если посмотреть на разложение <span class="mono">(a+b)⁴</span>, видна закономерность (pattern):<br>
+      • первый член — <span class="mono">a⁴</span>, дальше степень <b>a уменьшается на 1</b>, а степень <b>b увеличивается на 1</b> в каждом следующем члене;<br>
+      • у всех членов <b>сумма степеней всегда равна n</b> (a⁴, a³b, a²b², ab³, b⁴ — везде сумма степеней = 4).
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ================= THEORY 2: PASCAL'S TRIANGLE ================= -->
+  <section class="card theory-block">
+    <div class="section-label">теория · theory</div>
+    <h2 class="section-title serif">Треугольник Паскаля</h2>
+    <p class="section-sub">Pascal's Triangle — коэффициенты разложения тоже образуют закономерность.</p>
+
+    <div class="pascal">
+      <div class="prow"><span class="n-label">n=0:</span><div class="vals"><span>1</span></div></div>
+      <div class="prow"><span class="n-label">n=1:</span><div class="vals"><span>1</span><span>1</span></div></div>
+      <div class="prow"><span class="n-label">n=2:</span><div class="vals"><span>1</span><span>2</span><span>1</span></div></div>
+      <div class="prow"><span class="n-label">n=3:</span><div class="vals"><span>1</span><span>3</span><span>3</span><span>1</span></div></div>
+      <div class="prow"><span class="n-label">n=4:</span><div class="vals"><span>1</span><span>4</span><span>6</span><span>4</span><span>1</span></div></div>
+      <div class="prow next"><span class="n-label">n=5:</span><div class="vals"><span>1</span><span>5</span><span>10</span><span>10</span><span>5</span><span>1</span></div></div>
+    </div>
+
+    <div class="rule-callout"><b>Как построить следующую строку:</b> каждое число — это <b>сумма двух чисел над ним</b>. Например, строка n=5 получена из строки n=4 (1, 4, 6, 4, 1): 1, (1+4)=5, (4+6)=10, (6+4)=10, (4+1)=5, 1.</div>
+
+    <div class="formula-box">
+      $$(a+b)^5=1a^5+5a^4b+10a^3b^2+10a^2b^3+5ab^4+1b^5$$
+    </div>
+
+    <div class="algo-list">
+      <li><span class="algo-num">1</span><span>Определите <b>n</b> (индекс/степень) — это номер нужной строки треугольника Паскаля.</span></li>
+      <li><span class="algo-num">2</span><span>Определите <b>a</b> и <b>b</b> в вашем выражении (осторожно, если это не просто x — например, в (3x+2)³: a=3x, b=2).</span></li>
+      <li><span class="algo-num">3</span><span>Выпишите члены: коэффициент × aⁿ⁻ʳ × bʳ, где степень a убывает от n до 0, а степень b растёт от 0 до n.</span></li>
+      <li><span class="algo-num">4</span><span>Упростите каждый член — возведите a и b в степень и перемножьте (не забудьте про знаки, если b отрицательное!).</span></li>
+    </div>
+  </section>
+
+  <!-- ================= WORKED EXAMPLES ================= -->
+  <section>
+    <div class="section-label">примеры · worked examples</div>
+    <h2 class="section-title serif">8 разобранных примеров</h2>
+    <p class="section-sub">Примеры 2–5 — точно с урока; остальные — доп. практика той же техники.</p>
+  </section>
+
+  <!-- WE1 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 1 · Example 1</span>
+      <span class="given-badge">строка n=3 из n=2</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-basic">basic · построение треугольника Паскаля</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Как получить строку n=3, зная строку n=2 (1, 2, 1)?</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">сложите соседние числа строки n=2</div><div class="step-formula">1, (1+2)=3, (2+1)=3, 1</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">запишите разложение</div><div class="step-formula">$$(a+b)^3=1a^3+3a^2b+3ab^2+1b^3$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">строка n=3: 1, 3, 3, 1</span></div>
+    </div>
+  </div>
+
+  <!-- WE2 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 2 · Example 2</span>
+      <span class="given-badge">$(3x+2)^3$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-sub">substitution · a=3x, b=2</div>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">индекс n=3 → строка (1,3,3,1)</div><div class="step-formula">a=3x, b=2</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">подставьте · substitute</div><div class="step-formula">$$1(3x)^3+3(3x)^2(2)+3(3x)(2)^2+1(2)^3$$</div></div></div>
+        <div class="step"><div class="step-badge purple">3</div><div class="step-content"><div class="step-label">упростите · simplify</div><div class="step-formula">$$=27x^3+54x^2+36x+8$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">27x³+54x²+36x+8</span></div>
+    </div>
+  </div>
+
+  <!-- WE3 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 3 · Example 3</span>
+      <span class="given-badge">$(5-2x)^4$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-sub">substitution · a=5, b=−2x</div>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">индекс n=4 → строка (1,4,6,4,1)</div><div class="step-formula">a=5, b=−2x</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">подставьте · substitute</div><div class="step-formula">$$1(5)^4+4(5)^3(-2x)+6(5)^2(-2x)^2+4(5)(-2x)^3+1(-2x)^4$$</div></div></div>
+        <div class="step"><div class="step-badge purple">3</div><div class="step-content"><div class="step-label">упростите — следите за знаками!</div><div class="step-formula">$$=625-1000x+600x^2-160x^3+16x^4$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">625−1000x+600x²−160x³+16x⁴</span></div>
+    </div>
+  </div>
+
+  <!-- WE4 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 4 · Example 4</span>
+      <span class="given-badge">$(1-2x)^5$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-sub">substitution · a=1, b=−2x</div>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">индекс n=5 → строка (1,5,10,10,5,1)</div><div class="step-formula">a=1, b=−2x</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">подставьте · substitute</div><div class="step-formula">$$1(1)^5+5(1)^4(-2x)+10(1)^3(-2x)^2+10(1)^2(-2x)^3+5(1)(-2x)^4+1(-2x)^5$$</div></div></div>
+        <div class="step"><div class="step-badge purple">3</div><div class="step-content"><div class="step-label">упростите · simplify</div><div class="step-formula">$$=1-10x+40x^2-80x^3+80x^4-32x^5$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">1−10x+40x²−80x³+80x⁴−32x⁵</span></div>
+    </div>
+  </div>
+
+  <!-- WE5 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 5 · Example 5</span>
+      <span class="given-badge">coeff. x³ in $(3+5x)(1-2x)^5$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-coeff">coefficient hunting · продвинутая техника</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Используем разложение из примера 4 — не нужно перемножать всё выражение полностью!</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">подставьте разложение (1−2x)⁵ из примера 4</div><div class="step-formula">$$(3+5x)(1-10x+40x^2-80x^3+80x^4-32x^5)$$</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">найдите ДВЕ пары, дающие x³</div><div class="step-formula">3×(−80x³) и 5x×(40x²)</div></div></div>
+        <div class="step"><div class="step-badge purple">3</div><div class="step-content"><div class="step-label">вычислите каждую и сложите</div><div class="step-formula">$$3\times(-80x^3)=-240x^3,\quad 5x\times40x^2=200x^3$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">коэффициент x³ = −240+200 = −40</span></div>
+    </div>
+  </div>
+
+  <!-- WE6 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 6 · Example 6</span>
+      <span class="given-badge">$(x-3y)^3$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-two">two variables · a=x, b=−3y</div>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">индекс n=3 → строка (1,3,3,1)</div><div class="step-formula">a=x, b=−3y</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">подставьте и упростите</div><div class="step-formula">$$x^3+3x^2(-3y)+3x(-3y)^2+(-3y)^3$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">x³−9x²y+27xy²−27y³</span></div>
+    </div>
+  </div>
+
+  <!-- WE7 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 7 · Example 7</span>
+      <span class="given-badge">$(3x+1)^4$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-sub">substitution · оба слагаемых с коэффициентом</div>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">индекс n=4 → строка (1,4,6,4,1)</div><div class="step-formula">a=3x, b=1</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">подставьте и упростите</div><div class="step-formula">$$(3x)^4+4(3x)^3(1)+6(3x)^2(1)^2+4(3x)(1)^3+1^4$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">81x⁴+108x³+54x²+12x+1</span></div>
+    </div>
+  </div>
+
+  <!-- WE8 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 8 · Example 8</span>
+      <span class="given-badge">coeff. x² in $(2-x)(1+3x)^4$</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-coeff">coefficient hunting · второй пример</div>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">сначала разложите (1+3x)⁴ полностью</div><div class="step-formula">$$1+12x+54x^2+108x^3+81x^4$$</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">найдите пары, дающие x²</div><div class="step-formula">2×54x² и (−x)×12x</div></div></div>
+        <div class="step"><div class="step-badge purple">3</div><div class="step-content"><div class="step-label">вычислите и сложите</div><div class="step-formula">$$2\times54x^2=108x^2,\quad(-x)\times12x=-12x^2$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">коэффициент x² = 108−12 = 96</span></div>
+    </div>
+  </div>
+
+  <!-- ================= HOMEWORK ================= -->
+  <section class="card">
+    <div class="section-label">домашняя работа · homework</div>
+    <h2 class="section-title serif">5 задач для самопроверки</h2>
+    <p class="section-sub">Use Pascal's triangle to find the expansions of:</p>
+  </section>
+
+  <div class="hw-grid" id="hwGrid"></div>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="card">
+    <div class="section-label">тест · self-check quiz</div>
+    <h2 class="section-title serif">5 вопросов по теории</h2>
+    <p class="section-sub">Выберите один вариант ответа для каждого вопроса. Choose one option per question.</p>
+
+    <div id="quizContainer"></div>
+
+    <button id="quizSubmit">Проверить тест · Check quiz</button>
+    <button id="quizReset">Сбросить · Reset</button>
+    <div id="quizResult"></div>
+  </section>
+
+  <footer>Binomial Expansion via Pascal's Triangle · self-study revision page</footer>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+
+  // ---------------- HOMEWORK DATA ----------------
+  const hwData = [
+    {n:"1a", given:"(x+1)^3"},
+    {n:"1b", given:"(2-x)^3"},
+    {n:"1c", given:"(2x-y)^3"},
+    {n:"1d", given:"(2x+3)^4"},
+    {n:"1e", given:"(3x-2y)^3"},
+  ];
+
+  const hwGrid = document.getElementById('hwGrid');
+  hwData.forEach((item) => {
+    const card = document.createElement('div');
+    card.className = 'hw-card';
+    card.innerHTML = `
+      <span class="hw-num-label">Задача ${item.n} · Problem ${item.n}</span>
+      <div class="hw-problem">$${item.given}$</div>
+    `;
+    hwGrid.appendChild(card);
+  });
+
+  // ---------------- QUIZ DATA ----------------
+  const quizData = [
+    {
+      question: "Что означает слово «binomial»? / What does the word \"binomial\" mean?",
+      options: ["Три слагаемых (three terms)", "Два слагаемых (two terms)", "Одно слагаемое (one term)", "Дробь (a fraction)"],
+      correct: 1
+    },
+    {
+      question: "Как получить следующую строку треугольника Паскаля? / How do you get the next row of Pascal's triangle?",
+      options: ["Умножить соседние числа (multiply neighbouring numbers)", "Сложить два числа над ней (add the two numbers above it)", "Вычесть меньшее из большего (subtract smaller from larger)", "Просто повторить предыдущую строку"],
+      correct: 1
+    },
+    {
+      question: "В разложении (a+b)ⁿ, чему всегда равна сумма степеней a и b в каждом члене? / In the expansion of (a+b)ⁿ, what does the sum of the powers of a and b always equal?",
+      options: ["1", "n", "n²", "0"],
+      correct: 1
+    },
+    {
+      question: "В выражении (3x+2)³, чему равны a и b? / In the expression (3x+2)³, what are a and b?",
+      options: ["a=x, b=2", "a=3, b=2x", "a=3x, b=2", "a=3x+2, b=3"],
+      correct: 2
+    },
+    {
+      question: "Чтобы найти коэффициент x³ в произведении вроде (3+5x)(1−2x)⁵, что нужно сделать? / To find the coefficient of x³ in a product like (3+5x)(1−2x)⁵, what should you do?",
+      options: ["Раскрыть всё выражение полностью", "Найти все пары членов, дающие x³, и сложить их произведения (find all term-pairs giving x³ and add their products)", "Взять только последний член разложения", "Умножить коэффициенты при x"],
+      correct: 1
+    }
+  ];
+
+  const quizContainer = document.getElementById('quizContainer');
+
+  function shuffleOptions(q){
+    const indexed = q.options.map((opt, i) => ({opt, isCorrect: i === q.correct}));
+    for(let i = indexed.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+    }
+    return {
+      question: q.question,
+      options: indexed.map(x => x.opt),
+      correct: indexed.findIndex(x => x.isCorrect)
+    };
+  }
+
+  const shuffledQuizData = quizData.map(shuffleOptions);
+
+  shuffledQuizData.forEach((q, qi) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'quiz-q';
+    let optsHtml = '';
+    q.options.forEach((opt, oi) => {
+      optsHtml += `<div class="quiz-option" data-q="${qi}" data-o="${oi}">${opt}</div>`;
+    });
+    qDiv.innerHTML = `<div class="qtext">${qi+1}. ${q.question}</div><div class="quiz-options">${optsHtml}</div>`;
+    quizContainer.appendChild(qDiv);
+  });
+
+  const selected = {};
+  quizContainer.addEventListener('click', function(e){
+    const opt = e.target.closest('.quiz-option');
+    if(!opt) return;
+    const qi = opt.getAttribute('data-q');
+    const siblings = quizContainer.querySelectorAll(`.quiz-option[data-q="${qi}"]`);
+    siblings.forEach(s => s.classList.remove('selected'));
+    opt.classList.add('selected');
+    selected[qi] = opt.getAttribute('data-o');
+  });
+
+  document.getElementById('quizSubmit').addEventListener('click', function(){
+    let score = 0;
+    shuffledQuizData.forEach((q, qi) => {
+      const siblings = quizContainer.querySelectorAll(`.quiz-option[data-q="${qi}"]`);
+      siblings.forEach(s => {
+        const oi = s.getAttribute('data-o');
+        if(parseInt(oi) === q.correct){ s.classList.add('correct'); }
+        else if(selected[qi] !== undefined && parseInt(oi) === parseInt(selected[qi])){ s.classList.add('wrong'); }
+      });
+      if(selected[qi] !== undefined && parseInt(selected[qi]) === q.correct) score++;
+    });
+    document.getElementById('quizResult').textContent = `Результат · Score: ${score} / ${shuffledQuizData.length}`;
+  });
+
+  document.getElementById('quizReset').addEventListener('click', function(){
+    quizContainer.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected','correct','wrong'));
+    document.getElementById('quizResult').textContent = '';
+    for(const k in selected) delete selected[k];
+  });
+</script>
+</body>
+</html>
