@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Геометрическая прогрессия</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+<style>
+  :root{
+    --bg:#f7f4f0;
+    --card:#ffffff;
+    --pink:#e84fa3;
+    --purple:#7c5cbf;
+    --pink-light:#fde8f4;
+    --pink-mid:#f9c9e8;
+    --purple-light:#ede8f8;
+    --ink:#1a1228;
+    --muted:#7a6e82;
+    --border:#e5dff0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    padding:48px 24px;
+    line-height:1.55;
+  }
+  .page{ max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:28px; }
+  h1,h2,h3,.serif{ font-family:'DM Serif Display', serif; font-weight:400; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  .card{ background:var(--card); border-radius:20px; border:1.5px solid var(--border); padding:28px; }
+
+  /* ---------- Header ---------- */
+  .header{ position:relative; overflow:hidden; background:var(--ink); border-radius:24px; padding:44px 32px; color:#f7f4f0; }
+  .header .blob{ position:absolute; border-radius:50%; filter:blur(50px); opacity:0.55; z-index:0; }
+  .header .blob1{ width:260px; height:260px; background:var(--pink); top:-100px; right:-60px;}
+  .header .blob2{ width:220px; height:220px; background:var(--purple); bottom:-90px; left:-60px;}
+  .header-content{ position:relative; z-index:1; }
+  .badge{ position:absolute; top:0; right:0; background:var(--pink); color:#fff; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:7px 14px; border-radius:20px; font-weight:600; z-index:2; }
+  .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.12em; color:var(--pink-mid); margin:0 0 14px 0; }
+  .header h1{ font-size:31px; margin:0 0 6px 0; line-height:1.18; color:#fff; }
+  .header .subtitle{ font-family:'JetBrains Mono', monospace; font-size:14px; color:#cfc3e0; margin:0 0 20px 0; }
+  .meta-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+  .meta-pill{ font-family:'JetBrains Mono', monospace; font-size:11.5px; padding:6px 12px; border-radius:20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#e9e2f4; }
+
+  /* ---------- Section labels ---------- */
+  .section-label{ display:flex; align-items:center; gap:12px; font-family:'JetBrains Mono', monospace; font-size:12.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:4px; }
+  .section-label::before{ content:""; display:inline-block; width:24px; height:3px; background:var(--pink); border-radius:2px; }
+  .section-title{ font-size:26px; margin:2px 0 6px 0; }
+  .section-sub{ color:var(--muted); font-size:15px; margin:0 0 8px 0; }
+
+  .divider{ height:2px; border:none; background:linear-gradient(90deg, var(--pink), var(--purple)); opacity:0.25; margin:4px 0; }
+
+  /* ---------- Theory ---------- */
+  .theory-block{ display:flex; flex-direction:column; gap:16px; }
+  .rule-callout{ background:var(--pink-light); border-left:4px solid var(--pink); border-radius:12px; padding:16px 20px; font-size:15px; }
+  .rule-callout b{ color:var(--pink); }
+  .note-box{ background:var(--purple-light); border-left:4px solid var(--purple); border-radius:12px; padding:14px 18px; font-size:13.5px; color:var(--ink); }
+
+  /* ---------- Single all-formulas block ---------- */
+  .all-formulas{
+    background:linear-gradient(135deg, var(--pink-light), var(--purple-light));
+    border:1.5px solid var(--border);
+    border-radius:20px;
+    padding:26px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  .all-formulas .af-title{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--purple);
+    font-weight:700;
+    text-align:center;
+  }
+  .af-row{
+    background:rgba(255,255,255,0.75);
+    border-radius:14px;
+    padding:16px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    text-align:center;
+  }
+  .af-formula{ font-family:'JetBrains Mono', monospace; font-size:19px; }
+  .af-caption{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted); }
+  .af-condition{ font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--pink); font-weight:600; }
+  .af-legend{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+    font-size:13px;
+    background:rgba(255,255,255,0.6);
+    border-radius:12px;
+    padding:14px 16px;
+  }
+  .af-legend span.k{ font-family:'JetBrains Mono', monospace; color:var(--purple); font-weight:700; }
+
+  /* ---------- Tags ---------- */
+  .tag{ display:inline-block; font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; padding:4px 12px; border-radius:20px; font-weight:600; }
+  .tag-basic{ background:#e3f5e9; color:#1c8a4c; }
+  .tag-find{ background:var(--purple-light); color:var(--purple); }
+  .tag-sum{ background:#fde3d0; color:#c65e17; }
+  .tag-inf{ background:var(--pink-light); color:var(--pink); }
+
+  /* ---------- Worked examples ---------- */
+  .example-card{ border-radius:20px; overflow:hidden; border:1.5px solid var(--border); background:var(--card); }
+  .example-header{ background:linear-gradient(135deg,#1e0e35,#3a1f6e); color:#fff; padding:18px 22px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .example-header .ex-title{ font-family:'DM Serif Display', serif; font-size:20px; }
+  .given-badge{ font-family:'JetBrains Mono', monospace; background:var(--pink); color:#fff; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; white-space:nowrap; }
+  .example-body{ padding:22px; display:flex; flex-direction:column; gap:16px; }
+  .steps{ display:flex; flex-direction:column; gap:12px; }
+  .step{ display:flex; gap:14px; align-items:flex-start; }
+  .step-badge{ flex:none; width:30px; height:30px; border-radius:50%; background:var(--pink-light); color:var(--pink); font-family:'JetBrains Mono', monospace; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .step-badge.purple{ background:var(--purple-light); color:var(--purple); }
+  .step-content{ flex:1; min-width:0; }
+  .step-label{ font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:3px; }
+  .step-formula{ font-family:'JetBrains Mono', monospace; font-size:15px; overflow-x:auto; }
+  .answer-row{ background:var(--pink-light); border-radius:12px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-family:'JetBrains Mono', monospace; font-weight:600; font-size:15px; }
+  .answer-row .val{ color:var(--pink); font-size:16px; }
+
+  /* ---------- Homework grid ---------- */
+  .hw-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .hw-card{ border-radius:18px; border:1.5px solid var(--border); background:var(--card); padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .hw-num{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .hw-num-label{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+  .hw-problem{ font-family:'JetBrains Mono', monospace; font-size:14.5px; overflow-x:auto; min-height:24px; }
+
+  .hw-section-header{
+    grid-column: 1 / -1;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--purple);
+    font-weight:700;
+    padding:14px 4px 2px 4px;
+    border-top:2px dashed var(--border);
+    margin-top:6px;
+  }
+  .hw-section-header:first-child{ border-top:none; margin-top:0; padding-top:0; }
+
+  /* ---------- Quiz ---------- */
+  .quiz-q{ border:1.5px solid var(--border); border-radius:16px; padding:18px; margin-bottom:16px; background:var(--card); }
+  .quiz-q .qtext{ font-weight:600; margin-bottom:12px; font-size:15px; }
+  .quiz-options{ display:flex; flex-direction:column; gap:8px; }
+  .quiz-option{ display:flex; align-items:center; gap:10px; border:1.5px solid var(--border); border-radius:12px; padding:10px 14px; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:13.5px; transition:background 0.15s, border-color 0.15s; }
+  .quiz-option:hover{ background:var(--pink-light); }
+  .quiz-option.selected{ border-color:var(--purple); background:var(--purple-light); }
+  .quiz-option.correct{ border-color:#1c8a4c; background:#e3f5e9; }
+  .quiz-option.wrong{ border-color:#c0367a; background:#fde3ec; }
+  #quizSubmit, #quizReset{ border:none; background:var(--pink); color:#fff; font-family:'JetBrains Mono', monospace; font-weight:600; font-size:14px; padding:12px 22px; border-radius:14px; cursor:pointer; margin-right:10px; }
+  #quizReset{ background:var(--purple); }
+  #quizResult{ font-family:'JetBrains Mono', monospace; font-size:16px; font-weight:600; margin-top:14px; }
+
+  footer{ text-align:center; color:var(--muted); font-family:'JetBrains Mono', monospace; font-size:12px; padding:12px 0 4px 0; }
+
+  @media (max-width:640px){
+    body{ padding:28px 14px; }
+    .hw-grid, .af-legend{ grid-template-columns:1fr; }
+    .header h1{ font-size:23px; }
+    .badge{ position:static; display:inline-block; margin-bottom:14px; }
+    .header .header-content{ display:flex; flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ================= HEADER ================= -->
+  <header class="header">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <span class="badge">algebra · sequences &amp; series</span>
+    <div class="header-content">
+      <p class="eyebrow">1.4 · Geometric Sequence (G.S.)</p>
+      <h1>Геометрическая прогрессия</h1>
+      <p class="subtitle">Geometric Sequences &amp; Series</p>
+      <div class="meta-row">
+        <span class="meta-pill">уровень · standard</span>
+        <span class="meta-pill">⏱ 25–30 min self-study</span>
+        <span class="meta-pill">5 worked examples</span>
+        <span class="meta-pill">10 practice · 5 quiz</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= THEORY: DEFINITION ================= -->
+  <section class="card theory-block">
+    <div class="section-label">теория · theory</div>
+    <h2 class="section-title serif">Определение</h2>
+    <p class="section-sub">Geometric Sequence — прогрессия, где каждый член получается умножением на постоянное число.</p>
+
+    <p>Если задан первый член <span class="mono">u₁</span> и мы каждый раз <b>умножаем на одно и то же число r</b> (не прибавляем, как в арифметической прогрессии!), получается <b>геометрическая прогрессия</b> (geometric sequence, сокращённо G.S.). Число <span class="mono">r</span> называется <b>общим отношением</b> (common ratio) — это отношение между любыми двумя соседними членами.</p>
+
+    <div class="rule-callout">Например: <span class="mono">u₁=5, r=2</span> ⟹ <span class="mono">5, 10, 20, 40, 80, ...</span> — каждый член в 2 раза больше предыдущего.</div>
+
+    <div class="note-box">
+      <b>Важно заметить (notice):</b><br>
+      • r может быть <b>отрицательным</b> — тогда знаки чередуются (+,−,+,−,...).<br>
+      • Если <span class="mono">|r|&lt;1</span> (r между −1 и 1), члены прогрессии <b>приближаются к нулю</b> (approach 0).
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ================= ALL FORMULAS IN ONE BLOCK ================= -->
+  <section class="card">
+    <div class="section-label">формулы · all formulas</div>
+    <h2 class="section-title serif">Все формулы геометрической прогрессии</h2>
+    <p class="section-sub">Everything you need, in one place.</p>
+
+    <div class="all-formulas">
+      <div class="af-title">geometric sequence — key formulas</div>
+
+      <div class="af-row">
+        <div class="af-formula">$$u_n=u_1\cdot r^{\,n-1}$$</div>
+        <div class="af-caption">n-й член прогрессии · the nth term (общая формула · general formula)</div>
+      </div>
+
+      <div class="af-row">
+        <div class="af-formula">$$S_n=\dfrac{u_1(r^n-1)}{r-1}=\dfrac{u_1(1-r^n)}{1-r}$$</div>
+        <div class="af-caption">сумма первых n членов · the sum of the first n terms</div>
+        <div class="af-condition">условие · condition: r ≠ 1</div>
+      </div>
+
+      <div class="af-row">
+        <div class="af-formula">$$S_\infty=\dfrac{u_1}{1-r}$$</div>
+        <div class="af-caption">сумма бесконечной прогрессии · the sum to infinity (ряд «сходится» · the series converges)</div>
+        <div class="af-condition">условие · condition: −1 &lt; r &lt; 1 &nbsp; (|r|&lt;1)</div>
+      </div>
+
+      <div class="af-legend">
+        <div><span class="k">u₁</span> — первый член (the first term)</div>
+        <div><span class="k">r</span> — общее отношение (the common ratio)</div>
+        <div><span class="k">n</span> — номер члена (the term number)</div>
+        <div><span class="k">uₙ</span> — n-й член (the nth term)</div>
+        <div><span class="k">Sₙ</span> — сумма первых n членов</div>
+        <div><span class="k">S∞</span> — сумма всех членов (n→∞)</div>
+      </div>
+    </div>
+
+    <div class="rule-callout" style="margin-top:16px;"><b>Если |r|&gt;1 (например r=3):</b> ряд <b>расходится</b> (diverges) — S∞ не существует, потому что члены становятся всё больше и больше.</div>
+  </section>
+
+  <!-- ================= WORKED EXAMPLES ================= -->
+  <section>
+    <div class="section-label">примеры · worked examples</div>
+    <h2 class="section-title serif">5 разобранных примеров</h2>
+    <p class="section-sub">От базового применения формулы до суммы n членов и суммы до бесконечности.</p>
+  </section>
+
+  <!-- WE1 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 1 · Example 1</span>
+      <span class="given-badge">u₁=3, r=2</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-basic">basic · nth term</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Find (a) the first four terms, (b) the 100th term.</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">a) умножайте на r=2 каждый раз</div><div class="step-formula">3, 6, 12, 24</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">b) используйте общую формулу uₙ=u₁rⁿ⁻¹</div><div class="step-formula">$$u_{100}=u_1r^{99}=3\times2^{99}$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">3,6,12,24; u₁₀₀=3·2⁹⁹ (число слишком большое — этого ответа достаточно!)</span></div>
+    </div>
+  </div>
+
+  <!-- WE2 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 2 · Example 2</span>
+      <span class="given-badge">u₁=10, u₁₀=196830</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-find">find r · и найти u₃</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Find u₃.</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">используйте формулу для u₁₀, чтобы найти r</div><div class="step-formula">$$u_{10}=u_1r^9 \;\Rightarrow\; 196830=10\cdot r^9$$</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">извлеките корень степени 9</div><div class="step-formula">$$r^9=19683 \;\Rightarrow\; r=\sqrt[9]{19683}=3$$</div></div></div>
+        <div class="step"><div class="step-badge purple">3</div><div class="step-content"><div class="step-label">теперь найдите u₃</div><div class="step-formula">$$u_3=u_1r^2=10\times3^2=90$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">u₃ = 90</span></div>
+    </div>
+  </div>
+
+  <!-- WE3 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 3 · Example 3</span>
+      <span class="given-badge">u₅=3, u₇=0.75</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-find">find u₁ и r · два несоседних члена</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">a) Find u₁ and r. b) Find u₁₀.</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">запишите обе формулы и разделите u₇ на u₅</div><div class="step-formula">$$\frac{u_7}{u_5}=\frac{u_1r^6}{u_1r^4}=r^2=\frac{0.75}{3}=0.25$$</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">извлеките квадратный корень — <b>два решения!</b></div><div class="step-formula">$$r=\pm0.5$$</div></div></div>
+        <div class="step"><div class="step-badge purple">3</div><div class="step-content"><div class="step-label">подставьте r² в первое уравнение, чтобы найти u₁</div><div class="step-formula">$$3=u_1(0.5)^4=u_1\cdot0.0625 \;\Rightarrow\; u_1=\frac{3}{0.0625}=48$$</div></div></div>
+        <div class="step"><div class="step-badge purple">4</div><div class="step-content"><div class="step-label">b) найдите u₁₀ для каждого случая r</div><div class="step-formula">$$r{=}0.5\!: u_{10}{=}48(0.5)^9{=}0.09375 \qquad r{=}{-}0.5\!: u_{10}{=}48(-0.5)^9{=}-0.09375$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">u₁=48, r=±0.5; u₁₀=±0.09375 (два случая!)</span></div>
+    </div>
+  </div>
+
+  <!-- WE4 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 4 · Example 4</span>
+      <span class="given-badge">u₁=5, r=2, найти S₈</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-sum">сумма n членов · sum of n terms</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Find the sum of the first 8 terms of 5, 10, 20, 40, ...</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">проверьте r≠1, используйте формулу Sₙ</div><div class="step-formula">$$S_8=\frac{u_1(r^8-1)}{r-1}=\frac{5(2^8-1)}{2-1}$$</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">вычислите</div><div class="step-formula">$$=\frac{5(255)}{1}=1275$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">S₈ = 1275</span></div>
+    </div>
+  </div>
+
+  <!-- WE5 -->
+  <div class="example-card">
+    <div class="example-header">
+      <span class="ex-title">Пример 5 · Example 5</span>
+      <span class="given-badge">u₁=1, r=0.5, найти S∞</span>
+    </div>
+    <div class="example-body">
+      <div class="tag tag-inf">сумма до бесконечности · sum to infinity</div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">Find the sum to infinity of 1, 1/2, 1/4, 1/8, ...</p>
+      <div class="steps">
+        <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-label">проверьте условие |r|&lt;1</div><div class="step-formula">|0.5| &lt; 1 ⟹ ряд сходится, S∞ существует</div></div></div>
+        <div class="step"><div class="step-badge purple">2</div><div class="step-content"><div class="step-label">примените формулу</div><div class="step-formula">$$S_\infty=\frac{u_1}{1-r}=\frac{1}{1-0.5}=\frac{1}{0.5}$$</div></div></div>
+      </div>
+      <div class="answer-row"><span>Ответ · Answer</span><span class="val">S∞ = 2</span></div>
+    </div>
+  </div>
+
+  <!-- ================= HOMEWORK ================= -->
+  <section class="card">
+    <div class="section-label">домашняя работа · homework</div>
+    <h2 class="section-title serif">10 задач для самопроверки</h2>
+    <p class="section-sub">1–2 — базовая формула; 3–4 — найти u₁ и r; 5–6 — сумма n членов; 7–8 — сумма до бесконечности; 9–10 — смешанные / на понимание.</p>
+  </section>
+
+  <div class="hw-grid" id="hwGrid"></div>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="card">
+    <div class="section-label">тест · self-check quiz</div>
+    <h2 class="section-title serif">5 вопросов по теории</h2>
+    <p class="section-sub">Выберите один вариант ответа для каждого вопроса. Choose one option per question.</p>
+
+    <div id="quizContainer"></div>
+
+    <button id="quizSubmit">Проверить тест · Check quiz</button>
+    <button id="quizReset">Сбросить · Reset</button>
+    <div id="quizResult"></div>
+  </section>
+
+  <footer>Geometric Sequences &amp; Series · self-study revision page</footer>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  });
+
+  // ---------------- HOMEWORK DATA ----------------
+  const hwData = [
+    {tag:"basic", section:"Базовая формула · Basic nth term", given:"u_1=4,\\;r=3", ask:"Find the first four terms and u₈."},
+    {tag:"basic", given:"u_1=100,\\;r=0.1", ask:"Find u₁ to u₅ and an expression for uₙ."},
+
+    {tag:"find", section:"Найти u₁ и r · Find u₁ and r", given:"u_1=2,\\;u_6=486", ask:"Find r (positive) and u₄."},
+    {tag:"find", given:"u_3=12,\\;u_5=48", ask:"Find u₁ and r (there are two possible values of r!)."},
+    {tag:"find", given:"u_2=6,\\;u_4=54", ask:"Find u₁ and r (again, two cases)."},
+
+    {tag:"sum", section:"Сумма n членов · Sum of n Terms", given:"u_1=2,\\;r=3", ask:"Find S₆, the sum of the first 6 terms."},
+    {tag:"sum", given:"u_1=1000,\\;r=0.5", ask:"Find S₁₀, the sum of the first 10 terms."},
+
+    {tag:"inf", section:"Сумма до бесконечности · Sum to Infinity", given:"u_1=8,\\;r=0.25", ask:"Find S∞."},
+    {tag:"inf", given:"u_1=6,\\;r=-\\tfrac13", ask:"Find S∞."},
+    {tag:"inf", given:"2,\\;6,\\;18,\\;54,\\;\\dots", ask:"Explain why S∞ does not exist for this sequence."},
+  ];
+
+  const hwGrid = document.getElementById('hwGrid');
+  hwData.forEach((item) => {
+    if(item.section){
+      const header = document.createElement('div');
+      header.className = 'hw-section-header';
+      header.textContent = item.section;
+      hwGrid.appendChild(header);
+    }
+    const card = document.createElement('div');
+    card.className = 'hw-card';
+    card.innerHTML = `
+      <div class="hw-problem">$${item.given}$</div>
+      <div style="font-size:13px;color:var(--muted);">${item.ask}</div>
+    `;
+    hwGrid.appendChild(card);
+  });
+
+  // ---------------- QUIZ DATA ----------------
+  const quizData = [
+    {
+      question: "Что делает прогрессию геометрической? / What makes a sequence geometric?",
+      options: ["Каждый член на одно и то же число БОЛЬШЕ предыдущего", "Каждый член получается умножением предыдущего на одно и то же число (a constant ratio between consecutive terms)", "Все члены равны", "Сумма членов постоянна"],
+      correct: 1
+    },
+    {
+      question: "Какая формула для n-го члена геометрической прогрессии? / What is the formula for the nth term?",
+      options: ["uₙ = u₁ + (n−1)r", "uₙ = u₁ · r^(n−1)", "uₙ = u₁ · n · r", "uₙ = u₁ / r^n"],
+      correct: 1
+    },
+    {
+      question: "При каком условии существует сумма до бесконечности S∞? / Under what condition does S∞ exist?",
+      options: ["r > 1", "r = 1", "−1 < r < 1 (|r|<1)", "r может быть любым"],
+      correct: 2
+    },
+    {
+      question: "Что происходит со знаками членов, если r отрицательное? / What happens to the signs of the terms if r is negative?",
+      options: ["Все члены становятся отрицательными", "Знаки чередуются: +,−,+,−,... (the signs alternate)", "Знаки не меняются", "Прогрессия перестаёт существовать"],
+      correct: 1
+    },
+    {
+      question: "Что значит, что ряд «расходится» (diverges)? / What does it mean for a series to \"diverge\"?",
+      options: ["Сумма приближается к 0", "Сумма до бесконечности не существует, т.к. |r|≥1 (the sum to infinity does not exist)", "Все члены равны 1", "Прогрессия арифметическая, а не геометрическая"],
+      correct: 1
+    }
+  ];
+
+  const quizContainer = document.getElementById('quizContainer');
+
+  function shuffleOptions(q){
+    const indexed = q.options.map((opt, i) => ({opt, isCorrect: i === q.correct}));
+    for(let i = indexed.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+    }
+    return {
+      question: q.question,
+      options: indexed.map(x => x.opt),
+      correct: indexed.findIndex(x => x.isCorrect)
+    };
+  }
+
+  const shuffledQuizData = quizData.map(shuffleOptions);
+
+  shuffledQuizData.forEach((q, qi) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'quiz-q';
+    let optsHtml = '';
+    q.options.forEach((opt, oi) => {
+      optsHtml += `<div class="quiz-option" data-q="${qi}" data-o="${oi}">${opt}</div>`;
+    });
+    qDiv.innerHTML = `<div class="qtext">${qi+1}. ${q.question}</div><div class="quiz-options">${optsHtml}</div>`;
+    quizContainer.appendChild(qDiv);
+  });
+
+  const selected = {};
+  quizContainer.addEventListener('click', function(e){
+    const opt = e.target.closest('.quiz-option');
+    if(!opt) return;
+    const qi = opt.getAttribute('data-q');
+    const siblings = quizContainer.querySelectorAll(`.quiz-option[data-q="${qi}"]`);
+    siblings.forEach(s => s.classList.remove('selected'));
+    opt.classList.add('selected');
+    selected[qi] = opt.getAttribute('data-o');
+  });
+
+  document.getElementById('quizSubmit').addEventListener('click', function(){
+    let score = 0;
+    shuffledQuizData.forEach((q, qi) => {
+      const siblings = quizContainer.querySelectorAll(`.quiz-option[data-q="${qi}"]`);
+      siblings.forEach(s => {
+        const oi = s.getAttribute('data-o');
+        if(parseInt(oi) === q.correct){ s.classList.add('correct'); }
+        else if(selected[qi] !== undefined && parseInt(oi) === parseInt(selected[qi])){ s.classList.add('wrong'); }
+      });
+      if(selected[qi] !== undefined && parseInt(selected[qi]) === q.correct) score++;
+    });
+    document.getElementById('quizResult').textContent = `Результат · Score: ${score} / ${shuffledQuizData.length}`;
+  });
+
+  document.getElementById('quizReset').addEventListener('click', function(){
+    quizContainer.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected','correct','wrong'));
+    document.getElementById('quizResult').textContent = '';
+    for(const k in selected) delete selected[k];
+  });
+</script>
+</body>
+</html>
