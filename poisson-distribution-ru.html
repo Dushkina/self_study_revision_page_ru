@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poisson Distribution — Cheat Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+:root {
+  --bg:#f7f4f0; --card:#fff;
+  --pink:#e84fa3; --pink-light:#fde8f4; --pink-mid:#f9c9e8;
+  --purple:#7c5cbf; --purple-light:#ede8f8;
+  --green:#17a06b; --green-light:#e3f5eb;
+  --red:#d43030; --red-light:#fde8e8;
+  --orange:#d45e10; --orange-light:#fff1e6;
+  --ink:#1a1228; --muted:#7a6e82; --border:#e5dff0;
+  --mono:'JetBrains Mono',monospace;
+  --display:'DM Serif Display',serif;
+  --body:'Space Grotesk',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);padding:48px 24px;}
+.page{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:28px;}
+.katex{font-size:1.05em;}
+
+.header{display:flex;align-items:center;justify-content:space-between;padding:32px 36px;background:var(--ink);border-radius:20px;position:relative;overflow:hidden;gap:20px;}
+.header::before{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:var(--pink);opacity:0.15;}
+.header::after{content:'';position:absolute;right:40px;bottom:-80px;width:160px;height:160px;border-radius:50%;background:var(--purple);opacity:0.2;}
+.header-text{position:relative;z-index:1;}
+.header-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--pink);margin-bottom:6px;}
+.header-title{font-family:var(--display);font-size:38px;color:#fff;line-height:1.1;}
+.header-title span{color:var(--pink);}
+.header-badge{position:relative;z-index:1;background:var(--pink);color:#fff;font-family:var(--mono);font-size:12px;font-weight:500;padding:8px 16px;border-radius:50px;white-space:nowrap;}
+
+.section-label{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+.section-label::before{content:'';display:block;width:24px;height:2px;background:var(--pink);border-radius:2px;}
+.divider{height:2px;background:linear-gradient(90deg,var(--pink),var(--purple));border-radius:2px;opacity:0.25;}
+
+.chapter-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.chapter-item{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:10px;}
+.chapter-num{font-family:var(--mono);font-size:11px;color:var(--pink);background:var(--pink-light);border-radius:8px;padding:4px 8px;white-space:nowrap;font-weight:500;}
+.chapter-name{font-size:12px;font-weight:600;color:var(--ink);line-height:1.3;}
+
+.def-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:26px 30px;display:flex;gap:24px;align-items:flex-start;}
+.def-text{flex:1;}
+.def-text h3{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px;}
+.def-text p{font-size:13.5px;color:var(--muted);line-height:1.65;}
+.def-text p strong{color:var(--ink);}
+.def-formula-box{background:var(--pink-light);border:2px solid var(--pink-mid);border-radius:14px;padding:18px 22px;font-size:18px;text-align:center;flex-shrink:0;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* SCENARIO CARDS */
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.scenario-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;}
+.scenario-card.sc-pink{background:var(--pink-light);border-color:var(--pink-mid);}
+.scenario-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+.scenario-formula{font-size:15px;color:var(--ink);}
+.scenario-note{font-size:11.5px;color:var(--muted);line-height:1.5;}
+
+/* TABLE */
+.table-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;}
+.table-head-dark{background:var(--ink);padding:16px 22px;}
+.table-head-dark h3{color:#fff;font-size:14px;font-weight:700;}
+.table-head-dark p{color:rgba(255,255,255,0.45);font-size:11px;margin-top:2px;}
+.geo-table{width:100%;border-collapse:collapse;}
+.geo-table th{background:var(--purple-light);padding:10px 16px;text-align:center;font-size:12px;font-weight:700;color:var(--purple);border-bottom:1.5px solid var(--border);border-right:1px solid var(--border);}
+.geo-table th:first-child{background:#5c4a7a;color:#fff;}
+.geo-table th:last-child{border-right:none;}
+.geo-table td{padding:11px 16px;text-align:center;border-bottom:1px solid var(--border);border-right:1px solid var(--border);font-size:14px;color:var(--ink);}
+.geo-table td:first-child{background:#5c4a7a;color:#fff;font-weight:700;}
+.geo-table td:last-child{border-right:none;}
+.geo-table tr:last-child td{border-bottom:none;}
+.geo-table tr:hover td:not(:first-child){background:#faf8ff;}
+
+/* FORMULA MEGA GRID */
+.formula-mega{background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;}
+.formula-mega-head{padding:18px 26px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.fmh-pink{background:var(--pink-light);}
+.fmh-purple{background:var(--purple-light);}
+.fm-badge{font-family:var(--mono);font-size:11px;font-weight:700;padding:4px 12px;border-radius:8px;color:#fff;}
+.fm-b-pink{background:var(--pink);}
+.fm-b-purple{background:var(--purple);}
+.fm-title{font-size:14px;font-weight:700;color:var(--ink);}
+.fm-sub{font-size:12px;color:var(--muted);}
+.formula-grid-body{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.fg-cell{padding:16px 22px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+.fg-cell:nth-child(2n){border-right:none;}
+.fg-cell:nth-last-child(-n+2){border-bottom:none;}
+.fg-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+.fg-formula{font-size:16px;color:var(--ink);line-height:1.5;}
+
+/* VS COMPARISON */
+.vs-wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch;}
+.vs-card{background:var(--card);border:1.5px solid var(--border);overflow:hidden;}
+.vs-card.left{border-radius:20px 0 0 20px;border-right:none;}
+.vs-card.right{border-radius:0 20px 20px 0;}
+.vs-head{padding:16px 22px;display:flex;align-items:center;gap:12px;}
+.vs-head.vh-pink{background:var(--pink);}
+.vs-head.vh-purple{background:var(--purple);}
+.vs-head-title{color:#fff;font-size:15px;font-weight:700;}
+.vs-head-sub{color:rgba(255,255,255,0.7);font-size:11px;font-family:var(--mono);}
+.vs-body{padding:20px 22px;display:flex;flex-direction:column;gap:12px;}
+.vs-row{display:flex;flex-direction:column;gap:4px;}
+.vs-row-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);}
+.vs-row-val{font-size:13.5px;color:var(--ink);line-height:1.5;}
+.vs-divider{width:2px;background:linear-gradient(180deg,var(--pink),var(--purple));opacity:0.3;}
+
+/* NOTE BOX */
+.note-box{border-radius:16px;padding:18px 24px;display:flex;align-items:flex-start;gap:14px;}
+.note-box.nb-pink{background:var(--pink-light);border:1.5px solid var(--pink-mid);}
+.note-box.nb-ink{background:var(--ink);}
+.note-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.note-body h4{font-size:13px;font-weight:700;margin-bottom:5px;}
+.note-box.nb-pink .note-body h4{color:var(--pink);}
+.note-box.nb-ink .note-body h4{color:var(--pink);}
+.note-body p{font-size:13px;color:var(--muted);line-height:1.6;}
+.note-box.nb-ink .note-body p{color:rgba(255,255,255,0.75);}
+.note-body p strong{color:var(--ink);}
+.note-box.nb-ink .note-body p strong{color:#fff;}
+
+/* CRITERIA LIST */
+.criteria-list{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:20px 24px;display:flex;flex-direction:column;gap:10px;}
+.criteria-item{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;color:var(--ink);line-height:1.5;}
+.criteria-dot{width:8px;height:8px;border-radius:50%;background:var(--pink);flex-shrink:0;margin-top:6px;}
+
+/* WORKED EXAMPLES */
+.worked-header{background:linear-gradient(135deg,#1e0e35,#3a1f6e);border-radius:20px;padding:24px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.worked-header h2{color:#fff;font-size:17px;font-weight:700;margin-bottom:4px;}
+.worked-header p{color:rgba(255,255,255,0.5);font-size:12px;}
+.worked-badge{background:var(--pink);color:#fff;font-family:var(--mono);font-size:12px;font-weight:600;padding:8px 14px;border-radius:50px;white-space:nowrap;flex-shrink:0;}
+.parts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.part-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;}
+.part-head{padding:11px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.part-letter{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pl-pink{background:var(--pink);}
+.pl-purple{background:var(--purple);}
+.part-q{font-size:13px;font-weight:600;color:var(--ink);}
+.part-body{padding:14px 16px;display:flex;flex-direction:column;gap:8px;}
+.step{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;}
+.step-tag{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--bg);border-radius:4px;padding:2px 6px;flex-shrink:0;margin-top:2px;white-space:nowrap;}
+.step-text{color:var(--ink);line-height:1.6;}
+.ans-row{border-radius:10px;padding:9px 13px;display:flex;align-items:center;gap:8px;margin-top:4px;}
+.ans-pink{background:var(--pink-light);border:1.5px solid var(--pink-mid);}
+.ans-purple{background:var(--purple-light);border:1.5px solid #d0c4f0;}
+.ans-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+
+/* KEY FACTS */
+.facts-box{background:var(--ink);border-radius:20px;padding:24px 28px;display:flex;flex-direction:column;gap:14px;}
+.facts-title{color:var(--pink);font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;}
+.fact-row{display:flex;align-items:center;gap:14px;font-size:14px;color:#fff;}
+.fact-row .katex{color:#fff;}
+
+.footer{display:flex;justify-content:space-between;align-items:center;padding:0 4px;font-size:11px;color:var(--muted);font-family:var(--mono);}
+
+@media(max-width:640px){
+  .chapter-nav{grid-template-columns:1fr 1fr;}
+  .two-col,.parts-grid{grid-template-columns:1fr;}
+  .scenario-grid{grid-template-columns:1fr;}
+  .formula-grid-body{grid-template-columns:1fr;}
+  .vs-wrap{grid-template-columns:1fr;}
+  .vs-divider{width:100%;height:2px;}
+  .vs-card.left{border-radius:20px 20px 0 0;border-right:1.5px solid var(--border);border-bottom:none;}
+  .vs-card.right{border-radius:0 0 20px 20px;}
+  .header{flex-direction:column;align-items:flex-start;}
+  .header-title{font-size:30px;}
+}
+/* ── PHRASES TABLE ── */
+  .phrases-card{background: var(--card);
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    overflow: hidden;}
+.phrases-card-header{padding: 20px 28px;
+    background: linear-gradient(135deg, #1a1228 0%, #2d1f4a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;}
+.phrases-card-header h2{color: #fff;
+    font-size: 16px;
+    font-weight: 700;}
+.phrases-card-header p{color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    margin-top: 2px;}
+.phrases-card-header .icon{font-size: 24px;}
+td.phrase-cell{font-weight: 600;
+    color: var(--ink);}
+td.phrase-cell::before{content: '"';
+    color: var(--pink);
+    font-family: var(--display);
+    font-size: 16px;}
+td.phrase-cell::after{content: '"';
+    color: var(--pink);
+    font-family: var(--display);
+    font-size: 16px;}
+td.means-cell{font-family: var(--mono);
+    font-size: 13px;
+    color: var(--purple);
+    font-weight: 500;}
+td.calc-cell{font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink);}
+.pill{display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--mono);}
+.pill-sub{background: #fff0e8; color: #c05e1a;}
+.pill-direct{background: #e8f7f3; color: #187a5a;}
+.lookup-table-wrap{background: var(--card);
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    overflow: hidden;}
+.lookup-table-header{padding: 16px 24px;
+    background: var(--purple-light);
+    border-bottom: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;}
+.lookup-table-header h3{font-size: 14px;
+    font-weight: 700;
+    color: var(--purple);}
+.lookup-table-header span{font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);}
+.lookup-table{width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 12.5px;}
+.lookup-table th{background: var(--purple-light);
+    padding: 8px 14px;
+    text-align: center;
+    color: var(--purple);
+    font-weight: 700;
+    border-bottom: 1.5px solid var(--border);
+    border-right: 1px solid var(--border);
+    font-size: 12px;}
+.lookup-table th:first-child{text-align: left;}
+.lookup-table td{padding: 8px 14px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--ink);}
+.lookup-table td:first-child{text-align: left; font-weight: 600; color: var(--purple);}
+.lookup-table tr:last-child td{border-bottom: none;}
+.lookup-table td.highlighted{background: #fff0fb;
+    color: var(--pink);
+    font-weight: 700;
+    position: relative;}
+.lookup-table tr.n6-row td{color: var(--muted); background: #fafafa;}
+  .chapter-item{text-decoration:none;color:inherit;}
+
+  .phrases-card table{width:100%;border-collapse:collapse;}
+  .phrases-card thead{background:var(--purple-light);}
+  .phrases-card thead th{padding:12px 20px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--purple);text-align:left;border-bottom:1.5px solid var(--border);}
+  .phrases-card tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
+  .phrases-card tbody tr:last-child{border-bottom:none;}
+  .phrases-card tbody tr:hover{background:#faf8ff;}
+  .phrases-card tbody td{padding:13px 20px;font-size:13.5px;vertical-align:middle;}
+
+  .plain-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:26px 28px;}
+  .plain-lead,.plain-end{font-size:15px;line-height:1.6;color:var(--ink);}
+  .en-term{font-weight:700;color:var(--purple);}
+  .plain-quote{margin:14px 0 18px;padding:14px 18px;border-left:4px solid var(--pink);background:var(--pink-light);border-radius:0 14px 14px 0;font-weight:700;font-size:16px;line-height:1.5;color:var(--ink);}
+  .plain-quote.en{border-left-color:var(--purple);background:var(--purple-light);font-family:var(--mono);font-size:15px;color:var(--purple);}
+  .plain-sub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:4px 0 10px;}
+  .plain-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+  .plain-list li{display:flex;align-items:center;gap:10px;background:#faf8ff;border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-size:14px;line-height:1.4;}
+  .pl-ico{font-size:17px;flex:none;}
+  @media(max-width:640px){.plain-list{grid-template-columns:1fr;} .plain-card{padding:20px 18px;}}
+  .katex{position:relative;}
+  .chapter-nav{grid-template-columns:repeat(3,1fr);}
+  .tscroll .geo-table th,.tscroll .geo-table td{padding:10px 7px;font-size:13px;}
+  .tscroll .geo-table td:first-child,.tscroll .geo-table th:first-child{white-space:nowrap;padding:10px 12px;}
+  .def-formula-box{max-width:100%;overflow-x:auto;}
+  .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .tscroll .geo-table{min-width:560px;}
+  .geo-table td.hl-cell{background:var(--pink-light);color:var(--pink);font-weight:700;}
+  .phrases-card table{min-width:520px;}
+  .scenario-card.sc-purple{background:var(--purple-light);border:1.5px solid #d9cff0;}
+  .fg-note{font-size:12px;color:var(--muted);margin-top:4px;}
+  .fg-formula.big{font-size:18px;}
+  .formula-grid-body.one{grid-template-columns:1fr;}
+  .formula-grid-body.three{grid-template-columns:repeat(3,1fr);}
+  .parts-grid.three{grid-template-columns:repeat(3,1fr);}
+  .parts-grid.one{grid-template-columns:1fr;}
+  .ans-row.ans-bad{background:#ffe8ee;color:#b3244f;}
+  .criteria-num{flex:none;width:26px;height:26px;border-radius:8px;background:var(--pink);color:#fff;font-family:var(--mono);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .criteria-item:nth-child(even) .criteria-num{background:var(--purple);}
+  .chart-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:22px 24px;}
+  .chart-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+  .chart-head h3{font-family:var(--display);font-weight:400;font-size:20px;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted);}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;}
+  .chart-card svg{display:block;width:100%;height:auto;}
+  .ch-lbl{font-family:var(--mono);font-size:11px;fill:var(--muted);}
+  .ch-x{font-size:12px;fill:var(--ink);}
+  .chart-note{font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.55;}
+  .two-col>.note-box{height:100%;}
+  @media(max-width:760px){.parts-grid.three,.formula-grid-body.three{grid-template-columns:1fr;}}
+  @media(max-width:640px){.chapter-nav{grid-template-columns:1fr 1fr;} .def-card{flex-direction:column;align-items:stretch;} .def-formula-box{align-self:flex-start;}}
+
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="header">
+  <div class="header-text">
+    <div class="header-eyebrow">Statistics · Probability Distributions</div>
+    <h1 class="header-title">Poisson<br><span>Distribution</span></h1>
+  </div>
+  <div class="header-badge">X ~ Po(λ)</div>
+</header>
+
+<nav class="chapter-nav">
+  <a class="chapter-item" href="#s1"><span class="chapter-num">§1</span><span class="chapter-name">Определение и формула</span></a>
+  <a class="chapter-item" href="#s2"><span class="chapter-num">§2</span><span class="chapter-name">λ и длина интервала</span></a>
+  <a class="chapter-item" href="#s3"><span class="chapter-num">§3</span><span class="chapter-name">Mean = Variance</span></a>
+  <a class="chapter-item" href="#s4"><span class="chapter-num">§4</span><span class="chapter-name">Сумма двух Poisson</span></a>
+  <a class="chapter-item" href="#s5"><span class="chapter-num">§5</span><span class="chapter-name">Poisson vs Binomial</span></a>
+  <a class="chapter-item" href="#s6"><span class="chapter-num">§6</span><span class="chapter-name">Разобранные примеры</span></a>
+</nav>
+
+<!-- §1 -->
+<div class="section-label" id="s1">§1 · Что такое Poisson Distribution</div>
+<div class="def-card">
+  <div class="def-text">
+    <h3>Определение / Definition</h3>
+    <p>
+      Распределение Пуассона описывает <strong>количество событий</strong> \(X\), которые происходят в <strong>заданном интервале времени или пространства</strong>, если известна их средняя частота.<br><br>
+      The Poisson distribution is used to model the <strong>number of times</strong>, \(X\), that a particular event occurs within a given <strong>interval</strong> of time or space.
+    </p>
+  </div>
+  <div class="def-formula-box">\(X \sim \text{Po}(\lambda)\)</div>
+</div>
+
+<div class="section-label">Простыми словами — что считает Пуассон</div>
+<div class="plain-card">
+  <p class="plain-lead">Распределение Пуассона <span class="en-term">(Poisson distribution)</span> используется, когда мы считаем:</p>
+  <blockquote class="plain-quote">сколько раз некоторое случайное событие произойдёт за определённый промежуток времени или пространства.</blockquote>
+  <div class="plain-sub">Например:</div>
+  <ul class="plain-list">
+    <li><span class="pl-ico">📞</span>сколько звонков поступит за час;</li>
+    <li><span class="pl-ico">🚗</span>сколько машин проедет мимо школы за 3 минуты;</li>
+    <li><span class="pl-ico">📖</span>сколько ошибок будет на 10 страницах книги;</li>
+    <li><span class="pl-ico">🧵</span>сколько дефектов окажется на 1 метре ткани;</li>
+    <li><span class="pl-ico">💻</span>сколько посетителей зайдёт на сайт за час;</li>
+    <li><span class="pl-ico">💧</span>сколько протечек обнаружится на 5 км трубы.</li>
+  </ul>
+  <div class="plain-sub">Главный вопрос обычно выглядит так:</div>
+  <blockquote class="plain-quote en">How many events occur in a given interval?</blockquote>
+  <p class="plain-end">То есть мы считаем <strong>количество событий</strong>, а не время между ними.</p>
+</div>
+
+<!-- CONDITIONS -->
+<div class="section-label">Условия применения — Key Point 8.7 / 2.2</div>
+<div class="criteria-list">
+  <div class="criteria-item"><div class="criteria-dot"></div><span>События происходят <strong>независимо</strong> друг от друга — Events occur <strong>independently</strong></span></div>
+  <div class="criteria-item"><div class="criteria-dot"></div><span>События происходят <strong>по одному</strong> во времени или пространстве — Events occur <strong>singly</strong>, in space or time</span></div>
+  <div class="criteria-item"><div class="criteria-dot"></div><span>События происходят с <strong>постоянной средней частотой</strong>, поэтому среднее количество <strong>пропорционально длине интервала</strong> — at a <strong>constant average rate</strong>, so the mean is <strong>proportional</strong> to the length of the interval</span></div>
+  <div class="criteria-item"><div class="criteria-dot"></div><span>События <strong>случайны</strong> — The events are <strong>random</strong></span></div>
+</div>
+
+<!-- MAIN FORMULA -->
+<div class="formula-mega">
+  <div class="formula-mega-head fmh-pink">
+    <div>
+      <div class="fm-title">Poisson Probability Formula</div>
+      <div class="fm-sub">Summary of key points · 1</div>
+    </div>
+    <span class="fm-badge fm-b-pink">Главная формула</span>
+  </div>
+  <div class="formula-grid-body">
+    <div class="fg-cell">
+      <div class="fg-label">Probability formula</div>
+      <div class="fg-formula">\(P(X=x)=\dfrac{e^{-\lambda}\lambda^{x}}{x!}\)</div>
+      <div class="fg-note">для \(x=0,1,2,3,\ldots\) — без верхней границы</div>
+    </div>
+    <div class="fg-cell">
+      <div class="fg-label">Параметр λ</div>
+      <div class="fg-formula">\(\lambda=\) среднее количество событий</div>
+      <div class="fg-note">в <strong>одном</strong> интервале, который рассматривает задача</div>
+    </div>
+    <div class="fg-cell">
+      <div class="fg-label">Ни одного события</div>
+      <div class="fg-formula">\(P(X=0)=e^{-\lambda}\)</div>
+      <div class="fg-note">так как \(\lambda^0=1\) и \(0!=1\)</div>
+    </div>
+    <div class="fg-cell">
+      <div class="fg-label">Факториал</div>
+      <div class="fg-formula">\(4!=4\cdot3\cdot2\cdot1=24\)</div>
+      <div class="fg-note">\(e\approx2.71828\)</div>
+    </div>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <div class="table-head-dark">
+    <h3>Distribution of X ~ Po(λ) — Challenge</h3>
+    <p>Каждая следующая вероятность — предыдущая, умноженная на \(\lambda/x\)</p>
+  </div>
+  <div class="tscroll">
+  <table class="geo-table">
+    <thead><tr><th>x</th><th>0</th><th>1</th><th>2</th><th>3</th><th>…</th><th>r</th></tr></thead>
+    <tbody><tr><td>P(X=x)</td><td>\(e^{-\lambda}\)</td><td>\(\dfrac{e^{-\lambda}\lambda^{1}}{1!}\)</td><td>\(\dfrac{e^{-\lambda}\lambda^{2}}{2!}\)</td><td>\(\dfrac{e^{-\lambda}\lambda^{3}}{3!}\)</td><td>…</td><td>\(\dfrac{e^{-\lambda}\lambda^{r}}{r!}\)</td></tr></tbody>
+  </table>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §2 -->
+<div class="section-label" id="s2">§2 · λ зависит от интервала — главная ловушка</div>
+<div class="formula-mega">
+  <div class="formula-mega-head fmh-purple">
+    <div>
+      <div class="fm-title">Масштабирование λ</div>
+      <div class="fm-sub">mean number is proportional to the length of the interval</div>
+    </div>
+    <span class="fm-badge fm-b-purple">Сначала λ</span>
+  </div>
+  <div class="formula-grid-body one">
+    <div class="fg-cell">
+      <div class="fg-formula big">\(\lambda_{\text{new}}=\lambda_{\text{old}}\times\dfrac{\text{new interval}}{\text{old interval}}\)</div>
+      <div class="fg-note">Работает для времени, длины, площади, количества страниц</div>
+    </div>
+  </div>
+</div>
+
+<div class="lookup-table-wrap">
+  <div class="lookup-table-header"><h3>3 leaks per 5 km · 6 emails per hour</h3><span>λ для нового интервала</span></div>
+  <div class="tscroll">
+  <table class="lookup-table">
+    <thead><tr><th>Интервал</th><th>1 km</th><th>5 km</th><th>10 km</th><th>20 km</th></tr></thead>
+    <tbody>
+      <tr><td>λ (leaks)</td><td>0.6</td><td class="highlighted">3</td><td>6</td><td>12</td></tr>
+    </tbody>
+    <thead><tr><th>Интервал</th><th>10 min</th><th>30 min</th><th>1 hour</th><th>2 hours</th></tr></thead>
+    <tbody>
+      <tr><td>λ (emails)</td><td>1</td><td>3</td><td class="highlighted">6</td><td>12</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="phrases-card">
+  <div class="phrases-card-header">
+    <div><h2>Phrase → Calculation Guide</h2><p>Как переводить формулировки задач</p></div>
+    <span class="icon">📋</span>
+  </div>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th>Phrase</th><th>Means</th><th>Calculation</th><th>Type</th></tr></thead>
+    <tbody>
+      <tr><td class="phrase-cell">exactly 5</td><td class="means-cell">\(X=5\)</td><td class="calc-cell">\(P(X=5)\)</td><td><span class="pill pill-direct">direct</span></td></tr>
+      <tr><td class="phrase-cell">fewer than 5</td><td class="means-cell">\(X&lt;5\)</td><td class="calc-cell">\(P(X\le4)\)</td><td><span class="pill pill-direct">direct</span></td></tr>
+      <tr><td class="phrase-cell">at most 5 / no more than 5</td><td class="means-cell">\(X\le5\)</td><td class="calc-cell">\(P(X\le5)\)</td><td><span class="pill pill-direct">direct</span></td></tr>
+      <tr><td class="phrase-cell">more than 5</td><td class="means-cell">\(X&gt;5\)</td><td class="calc-cell">\(1-P(X\le5)\)</td><td><span class="pill pill-sub">subtract</span></td></tr>
+      <tr><td class="phrase-cell">at least 5 / no fewer than 5</td><td class="means-cell">\(X\ge5\)</td><td class="calc-cell">\(1-P(X\le4)\)</td><td><span class="pill pill-sub">subtract</span></td></tr>
+      <tr><td class="phrase-cell">at least 1</td><td class="means-cell">\(X\ge1\)</td><td class="calc-cell">\(1-P(X=0)=1-e^{-\lambda}\)</td><td><span class="pill pill-sub">subtract</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="note-box nb-ink">
+  <div class="note-icon">💬</div>
+  <div class="note-body">
+    <h4>Почему почти всегда complement</h4>
+    <p>\(P(X\ge2)=P(X=2)+P(X=3)+\ldots\) — бесконечная сумма, ведь у Пуассона нет верхней границы. Поэтому: <strong>\(P(X&gt;k)=1-P(X\le k)\)</strong>, но <strong>\(P(X\ge k)=1-P(X\le k-1)\)</strong>. Разница в единицу — и именно здесь теряют баллы.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §3 -->
+<div class="section-label" id="s3">§3 · Mean и Variance — Key Point 8.8 / 2.4</div>
+<div class="formula-mega">
+  <div class="formula-mega-head fmh-pink">
+    <div>
+      <div class="fm-title">Если \(X\sim\text{Po}(\lambda)\)</div>
+      <div class="fm-sub">Единственный параметр — и среднее, и дисперсия</div>
+    </div>
+    <span class="fm-badge fm-b-pink">Mean = Variance</span>
+  </div>
+  <div class="formula-grid-body three">
+    <div class="fg-cell"><div class="fg-label">Mean</div><div class="fg-formula">\(E(X)=\lambda\)</div></div>
+    <div class="fg-cell"><div class="fg-label">Variance</div><div class="fg-formula">\(\text{Var}(X)=\sigma^2=\lambda\)</div></div>
+    <div class="fg-cell"><div class="fg-label">Standard deviation</div><div class="fg-formula">\(\sigma=\sqrt{\lambda}\)</div><div class="fg-note">\(X\sim\text{Po}(8)\): \(\sigma=\sqrt8\approx2.83\)</div></div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="note-box nb-pink">
+    <div class="note-icon">✅</div>
+    <div class="note-body">
+      <h4>Полезный индикатор</h4>
+      <p>Если для данных \(\bar{x}\approx\text{Var}\), Пуассон — правдоподобная модель (например, \(\bar{x}=2.82\), \(\text{Var}=2.8276\)).</p>
+    </div>
+  </div>
+  <div class="note-box nb-pink">
+    <div class="note-icon">⚠️</div>
+    <div class="note-body">
+      <h4>Но не доказательство</h4>
+      <p>Равенство mean и variance само по себе <strong>недостаточно</strong>: это свойство есть и у других распределений. Проверь условия: независимость, события по одному, постоянная частота.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §4 -->
+<div class="section-label" id="s4">§4 · Сумма двух распределений Пуассона — 2.3</div>
+<div class="def-card">
+  <div class="def-text">
+    <h3>Adding Poisson distributions</h3>
+    <p>Если \(X\) и \(Y\) — <strong>независимые</strong> пуассоновские величины, то \(Z=X+Y\) тоже имеет распределение Пуассона, а параметры просто <strong>складываются</strong>.<br><br>If \(X\sim\text{Po}(\lambda)\) and \(Y\sim\text{Po}(\mu)\) are independent, then \(X+Y\sim\text{Po}(\lambda+\mu)\).</p>
+  </div>
+  <div class="def-formula-box">\(X+Y\sim\text{Po}(\lambda+\mu)\)</div>
+</div>
+
+<div class="note-box nb-ink">
+  <div class="note-icon">🚩</div>
+  <div class="note-body">
+    <h4>Watch out</h4>
+    <p>\(X\) и \(Y\) должны описывать события в <strong>одном и том же интервале</strong> времени или пространства. Сначала приведи оба λ к одному интервалу, потом складывай.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §5 -->
+<div class="section-label" id="s5">§5 · Poisson vs Binomial — как не перепутать</div>
+<div class="vs-wrap">
+  <div class="vs-card left">
+    <div class="vs-head vh-purple"><div><div class="vs-head-title">Binomial</div><div class="vs-head-sub">X ~ B(n, p)</div></div></div>
+    <div class="vs-body">
+      <div class="vs-row"><div class="vs-row-label">Количество испытаний</div><div class="vs-row-val"><strong>Фиксировано</strong> — \(n\) попыток, каждая успех / неудача.</div></div>
+      <div class="vs-row"><div class="vs-row-label">Значения X</div><div class="vs-row-val">\(0,1,\ldots,n\) — есть верхняя граница.</div></div>
+      <div class="vs-row"><div class="vs-row-label">Mean / Variance</div><div class="vs-row-val">\(np\) и \(np(1-p)\) — разные.</div></div>
+      <div class="vs-row"><div class="vs-row-label">Слова-маркеры</div><div class="vs-row-val">out of 20, among 100, 15 attempts</div></div>
+    </div>
+  </div>
+  <div class="vs-divider"></div>
+  <div class="vs-card right">
+    <div class="vs-head vh-pink"><div><div class="vs-head-title">Poisson</div><div class="vs-head-sub">X ~ Po(λ)</div></div></div>
+    <div class="vs-body">
+      <div class="vs-row"><div class="vs-row-label">Количество испытаний</div><div class="vs-row-val"><strong>Нет</strong> фиксированного \(n\) — только средняя частота событий.</div></div>
+      <div class="vs-row"><div class="vs-row-label">Значения X</div><div class="vs-row-val">\(0,1,2,\ldots\) — верхней границы нет.</div></div>
+      <div class="vs-row"><div class="vs-row-label">Mean / Variance</div><div class="vs-row-val">оба равны \(\lambda\).</div></div>
+      <div class="vs-row"><div class="vs-row-label">Слова-маркеры</div><div class="vs-row-val">per hour, per day, per km, per page, average rate</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="note-box nb-pink">
+  <div class="note-icon">🔑</div>
+  <div class="note-body">
+    <h4>Tip из учебника</h4>
+    <p>Упомянута <strong>средняя частота</strong> событий (average rate) — бери Пуассона. Можно выделить <strong>фиксированное количество попыток</strong> — обычно нужен Binomial.</p>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="note-box nb-ink">
+    <div class="note-icon">⏱️</div>
+    <div class="note-body">
+      <h4>Poisson ≠ время ожидания</h4>
+      <p><strong>Poisson = how many?</strong> Количество писем за час — \(\text{Po}(6)\). <strong>Exponential = how long to wait?</strong> Время между письмами — уже не Пуассон (Worked Example 8.8). При 6 событиях в час средний промежуток — \(\tfrac16\) ч = 10 мин.</p>
+    </div>
+  </div>
+  <div class="note-box nb-ink">
+    <div class="note-icon">🔗</div>
+    <div class="note-body">
+      <h4>Binomial → Poisson</h4>
+      <p>Когда \(n\) большое, а \(p\) маленькое (редкие события среди многих попыток), бином можно приблизить Пуассоном с <strong>\(\lambda=np\)</strong>. Поэтому Пуассона называют распределением редких событий.</p>
+    </div>
+  </div>
+</div>
+
+<div class="note-box nb-pink">
+  <div class="note-icon">📈</div>
+  <div class="note-body">
+    <h4>Форма распределения и реальный мир</h4>
+    <p>Маленькое \(\lambda\) (≈1) — сильная скошенность вправо; с ростом \(\lambda\) распределение становится симметричнее и похожим на нормальное, но остаётся дискретным. В жизни условия редко выполняются идеально: посещаемость сайта ночью и вечером разная, а один репост ссылки приводит за собой других. Но даже тогда Пуассон часто даёт полезную <strong>модель</strong> (Concepts — Modelling).</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §6 -->
+<div class="section-label" id="s6">§6 · Разобранные примеры</div>
+
+<div class="worked-header">
+  <div><h2>Пример 1 — Worked Example 8.9</h2><p>Water pipe: on average 3 leaks in each 5 km section</p></div>
+  <div class="worked-badge">\(X\sim\text{Po}(3)\)</div>
+</div>
+<div class="parts-grid three">
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-pink">a</span><span class="part-q">Ровно 2 протечки на 5 км</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">формула</span><span class="step-text">\(P(X=2)=\dfrac{e^{-3}3^{2}}{2!}\)</span></div>
+      <div class="step"><span class="step-tag">GDC</span><span class="step-text">Poisson P.D., \(x=2,\ \lambda=3\)</span></div>
+      <div class="ans-row ans-pink"><span class="ans-label">Ответ</span><span>\(0.224\)</span></div>
+    </div>
+  </div>
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-purple">b</span><span class="part-q">Не менее 2 протечек</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">complement</span><span class="step-text">\(P(X\ge2)=1-P(X\le1)\)</span></div>
+      <div class="step"><span class="step-tag">GDC</span><span class="step-text">Poisson C.D.: \(=1-0.199\)</span></div>
+      <div class="ans-row ans-purple"><span class="ans-label">Ответ</span><span>\(0.801\)</span></div>
+    </div>
+  </div>
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-pink">c</span><span class="part-q">Ни одной протечки на 1 км</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">новый λ</span><span class="step-text">\(\lambda=3\times\tfrac15=0.6\)</span></div>
+      <div class="step"><span class="step-tag">формула</span><span class="step-text">\(P(X=0)=e^{-0.6}\)</span></div>
+      <div class="ans-row ans-pink"><span class="ans-label">Ответ</span><span>\(0.549\)</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="worked-header">
+  <div><h2>Пример 2 — Example 6 (2.3)</h2><p>Adding independent Poisson variables</p></div>
+  <div class="worked-badge">\(X\sim\text{Po}(3.6),\ Y\sim\text{Po}(4.4)\)</div>
+</div>
+<div class="parts-grid">
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-pink">a</span><span class="part-q">\(P(X+Y=7)\)</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">сложить λ</span><span class="step-text">\(X+Y\sim\text{Po}(3.6+4.4)=\text{Po}(8)\)</span></div>
+      <div class="step"><span class="step-tag">формула</span><span class="step-text">\(\dfrac{e^{-8}\,8^{7}}{7!}\)</span></div>
+      <div class="ans-row ans-pink"><span class="ans-label">Ответ</span><span>\(0.1396\)</span></div>
+    </div>
+  </div>
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-purple">b</span><span class="part-q">\(P(X+Y\le5)\)</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">распределение</span><span class="step-text">\(X+Y\sim\text{Po}(8)\)</span></div>
+      <div class="step"><span class="step-tag">GDC</span><span class="step-text">Poisson C.D., \(x=5,\ \lambda=8\)</span></div>
+      <div class="ans-row ans-purple"><span class="ans-label">Ответ</span><span>\(0.1912\)</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="worked-header">
+  <div><h2>Пример 3 — Worked Example 8.12</h2><p>7.8 hits/hour for maths, 6.5 hits/hour for physics</p></div>
+  <div class="worked-badge">\(Z\sim\text{Po}(14.3)\)</div>
+</div>
+<div class="parts-grid">
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-pink">a</span><span class="part-q">Больше 15 просмотров за час</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">сложить λ</span><span class="step-text">\(Z\sim\text{Po}(7.8+6.5)=\text{Po}(14.3)\)</span></div>
+      <div class="step"><span class="step-tag">complement</span><span class="step-text">\(P(Z&gt;15)=1-P(Z\le15)=1-0.639\)</span></div>
+      <div class="ans-row ans-pink"><span class="ans-label">Ответ</span><span>\(0.361\)</span></div>
+    </div>
+  </div>
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-purple">b</span><span class="part-q">Почему предположение сомнительно?</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">частота</span><span class="step-text">Частота просмотров вряд ли постоянна: в одни часы суток их больше, чем в другие.</span></div>
+      <div class="step"><span class="step-tag">независимость</span><span class="step-text">Когда больше просмотров по математике, вероятно, больше и по физике — часто от тех же пользователей.</span></div>
+      <div class="ans-row ans-purple"><span class="ans-label">Вывод</span><span>оба условия под сомнением</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="worked-header">
+  <div><h2>Пример 4 — Be the Examiner 8.3</h2><p>1.5 errors per 10 pages. P(more than 5 errors in 50 pages)?</p></div>
+  <div class="worked-badge">\(\lambda=1.5\times5=7.5\)</div>
+</div>
+<div class="parts-grid three">
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-purple">1</span><span class="part-q">\(\text{Po}(1.5),\ P(X&gt;1)=0.442\)</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">ошибка</span><span class="step-text">Не пересчитали λ для 50 страниц, а событие «перевели» в 1 ошибку на 10 страниц — так нельзя.</span></div>
+      <div class="ans-row ans-bad"><span class="ans-label">Вердикт</span><span>✗ неверно</span></div>
+    </div>
+  </div>
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-pink">2</span><span class="part-q">\(\text{Po}(7.5),\ 1-P(X\le5)=0.759\)</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">λ</span><span class="step-text">50 страниц = 5 × 10 → \(\lambda=7.5\)</span></div>
+      <div class="step"><span class="step-tag">complement</span><span class="step-text">\(X&gt;5\Rightarrow1-P(X\le5)\)</span></div>
+      <div class="ans-row ans-pink"><span class="ans-label">Вердикт</span><span>✓ верно</span></div>
+    </div>
+  </div>
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-purple">3</span><span class="part-q">\(\text{Po}(7.5),\ 1-P(X\le4)=0.868\)</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">ошибка</span><span class="step-text">\(1-P(X\le4)=P(X\ge5)\), а нужно \(P(X&gt;5)=P(X\ge6)\).</span></div>
+      <div class="ans-row ans-bad"><span class="ans-label">Вердикт</span><span>✗ неверно</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="worked-header">
+  <div><h2>Пример 5 — Worked Example 8.8</h2><p>Jorge receives emails at a constant rate of 6 per hour. X = time between emails</p></div>
+  <div class="worked-badge">Poisson?</div>
+</div>
+<div class="parts-grid one">
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-pink">?</span><span class="part-q">Подходит ли модель Пуассона для X?</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">условия</span><span class="step-text">Независимость и постоянная частота выполняются.</span></div>
+      <div class="step"><span class="step-tag">но</span><span class="step-text">\(X\) — это <strong>время между событиями</strong>, а не количество писем за промежуток времени. Такое время описывает экспоненциальное распределение.</span></div>
+      <div class="ans-row ans-pink"><span class="ans-label">Ответ</span><span>Нет — Пуассон считает события, а не время</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ALGORITHM -->
+<div class="section-label">Алгоритм решения — 5 шагов</div>
+<div class="criteria-list">
+  <div class="criteria-item"><div class="criteria-num">1</div><span><strong>Что считает X?</strong> Запиши словами: \(X=\) number of calls in 2 hours.</span></div>
+  <div class="criteria-item"><div class="criteria-num">2</div><span><strong>Найди λ для этого интервала:</strong> 4 звонка/ч, 2 ч → \(\lambda=8\).</span></div>
+  <div class="criteria-item"><div class="criteria-num">3</div><span><strong>Запиши распределение:</strong> \(X\sim\text{Po}(8)\).</span></div>
+  <div class="criteria-item"><div class="criteria-num">4</div><span><strong>Переведи слова:</strong> at least 6 → \(P(X\ge6)\).</span></div>
+  <div class="criteria-item"><div class="criteria-num">5</div><span><strong>Посчитай напрямую или через complement:</strong> \(P(X\ge6)=1-P(X\le5)\).</span></div>
+</div>
+
+<div class="section-label">Краткая сводка — Summary of key points</div>
+<div class="facts-box">
+  <div class="facts-title">Key Facts о Poisson Distribution</div>
+  <div class="fact-row">📌 Если \(X\sim\text{Po}(\lambda)\), то \(P(X=x)=\dfrac{e^{-\lambda}\lambda^{x}}{x!}\) для \(x=0,1,2,3,\ldots\)</div>
+  <div class="fact-row">📌 Условия: события независимы, происходят по одному, с постоянной средней частотой (среднее пропорционально длине интервала)</div>
+  <div class="fact-row">📌 \(\lambda\) всегда считай для того интервала, о котором спрашивают</div>
+  <div class="fact-row">📌 \(E(X)=\text{Var}(X)=\lambda\), \(\sigma=\sqrt{\lambda}\)</div>
+  <div class="fact-row">📌 Независимые \(X\sim\text{Po}(\lambda)\), \(Y\sim\text{Po}(\mu)\): \(X+Y\sim\text{Po}(\lambda+\mu)\)</div>
+  <div class="fact-row">📌 \(P(X&gt;k)=1-P(X\le k)\), \(P(X\ge k)=1-P(X\le k-1)\)</div>
+</div>
+
+<footer class="footer">
+  <span>Statistics · Poisson Distribution · X ~ Po(λ)</span>
+  <span>\(P(X=x)=\frac{e^{-\lambda}\lambda^x}{x!}\) · \(E(X)=\text{Var}(X)=\lambda\)</span>
+</footer>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],
+    throwOnError: false
+  });
+});
+</script>
+</body>
+</html>
