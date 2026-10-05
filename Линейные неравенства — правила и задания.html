@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Линейные неравенства — правила и задания</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --paper:#FBFCFF; --grid:#DCE6F4; --ink:#1F3F94; --text:#22262F; --muted:#5A6070;
+  --red:#D2232A; --green:#1E7F4F; --card:#FFFFFF; --line:#C9D5E8; --soft:#EEF3FB;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#151A24; --grid:#222B3A; --ink:#8FB0FF; --text:#E6E9F0; --muted:#A0A7B6;
+    --red:#FF6B6F; --green:#5BD39A; --card:#1C2230; --line:#2E3850; --soft:#222B3D;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#151A24; --grid:#222B3A; --ink:#8FB0FF; --text:#E6E9F0; --muted:#A0A7B6;
+  --red:#FF6B6F; --green:#5BD39A; --card:#1C2230; --line:#2E3850; --soft:#222B3D;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; color:var(--text); font-family:"PT Sans","Segoe UI",Arial,sans-serif; font-size:17px; line-height:1.55;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;
+}
+.wrap{max-width:820px;margin:0 auto;padding:28px 18px 60px 18px;position:relative}
+@media (min-width:700px){
+  .wrap{padding-left:64px}
+  .wrap::before{content:"";position:absolute;left:40px;top:0;bottom:0;width:2px;background:var(--red);opacity:.55}
+}
+h1{font-size:2rem;line-height:1.2;margin:8px 0 4px;color:var(--ink)}
+.sub{color:var(--muted);margin:0 0 28px}
+h2{font-size:1.4rem;color:var(--ink);margin:40px 0 12px}
+.hand{font-family:"Caveat","Comic Sans MS",cursive;color:var(--red);font-size:1.5rem;line-height:1.25}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:14px 0}
+.rule-red{border:2px solid var(--red);border-radius:10px;padding:16px 20px;background:var(--card);margin:18px 0}
+.rule-red p{margin:6px 0}
+ol.steps{margin:6px 0;padding-left:1.4em}
+ol.steps li{margin:8px 0}
+.m{font-family:"PT Sans",sans-serif;font-weight:700;color:var(--ink);white-space:nowrap}
+.signs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}
+.signs div{background:var(--soft);border-radius:8px;padding:8px 10px;text-align:center}
+.ex{display:grid;gap:4px;margin:10px 0 4px;padding-left:4px}
+.ex .ln{display:flex;gap:14px;flex-wrap:wrap;align-items:baseline}
+.ex .note{color:var(--muted);font-size:.95rem}
+.ex .flip{color:var(--red);font-weight:700}
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line);padding:10px 0;margin:30px 0 0;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.score{font-weight:700;color:var(--ink)}
+.btn{font:inherit;font-size:.95rem;border-radius:8px;border:1px solid var(--ink);background:var(--card);color:var(--ink);padding:6px 12px;cursor:pointer}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.tasks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.task{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.task.ok{border-color:var(--green);box-shadow:inset 4px 0 0 var(--green)}
+.task.bad{border-color:var(--red);box-shadow:inset 4px 0 0 var(--red)}
+.task .q{font-size:1.15rem;margin-bottom:8px}
+.task .q b{color:var(--muted);font-weight:400;margin-right:6px}
+.ans{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ans span{font-weight:700}
+select,input{font:inherit;font-size:1rem;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--text)}
+input{width:72px}
+.fb{min-height:1.3em;margin-top:6px;font-size:.95rem}
+.fb.ok{color:var(--green)} .fb.bad{color:var(--red)}
+.sol{margin-top:8px;padding:8px 10px;background:var(--soft);border-radius:8px;font-size:.98rem}
+.sol div{margin:2px 0}
+.sol .flip{color:var(--red);font-weight:700}
+.linkbtn{background:none;border:none;color:var(--ink);text-decoration:underline;cursor:pointer;font:inherit;font-size:.92rem;padding:0;margin-top:4px}
+@media (prefers-reduced-motion:no-preference){.task{transition:border-color .2s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Линейные неравенства</h1>
+<p class="sub">Сначала прочитай правила и разбери примеры, потом решай задания 2 и 3. Ответ вводи в виде «x &gt; 4».</p>
+
+<h2>Сначала вспомним: линейное уравнение</h2>
+<div class="panel">
+  <p style="margin-top:0">Уравнение вида <span class="m">ax + b = cx + d</span> решается по алгоритму:</p>
+  <ol class="steps">
+    <li><b>Раскрой скобки</b>, если они есть: <span class="m">3(x + 1) = 3x + 3</span>.</li>
+    <li><b>Перенеси неизвестные в одну сторону, а числа — в другую.</b> При переносе через знак «=» слагаемое меняет знак на противоположный: <span class="m">+5 → −5</span>, <span class="m">−2x → +2x</span>.</li>
+    <li><b>Приведи подобные</b>: сложи все иксы слева и все числа справа.</li>
+    <li><b>Раздели обе части на коэффициент</b> перед x.</li>
+  </ol>
+  <div class="ex">
+    <div class="ln"><span class="m">5x − 3 = 2x + 18</span></div>
+    <div class="ln"><span class="m">5x − 2x = 18 + 3</span><span class="note">иксы влево, числа вправо, знаки поменялись</span></div>
+    <div class="ln"><span class="m">3x = 21</span></div>
+    <div class="ln"><span class="m">x = 7</span><span class="note">делим на 3</span></div>
+  </div>
+</div>
+
+<h2>Неравенства решаются так же, но с одним важным правилом</h2>
+<div class="panel">
+  <ol class="steps">
+    <li>Раскрой скобки.</li>
+    <li><b>Неизвестные — в одну сторону, числа — в противоположную.</b> При переносе слагаемое меняет знак, а знак неравенства остаётся прежним.</li>
+    <li>Приведи подобные слагаемые.</li>
+    <li>Раздели обе части на коэффициент перед x и <b>посмотри на его знак</b>:
+      положительный — знак неравенства не меняется; отрицательный — знак неравенства переворачивается.</li>
+    <li>Запиши ответ: <span class="m">x &lt; …</span>, <span class="m">x ≥ …</span> и т. д.</li>
+  </ol>
+</div>
+
+<div class="rule-red">
+  <p class="hand">Главное правило!</p>
+  <p><b>Если умножаешь или делишь обе части неравенства на отрицательное число — знак неравенства меняется на противоположный.</b></p>
+  <div class="signs">
+    <div><span class="m">&lt;</span> становится <span class="m">&gt;</span></div>
+    <div><span class="m">&gt;</span> становится <span class="m">&lt;</span></div>
+    <div><span class="m">≤</span> становится <span class="m">≥</span></div>
+    <div><span class="m">≥</span> становится <span class="m">≤</span></div>
+  </div>
+  <p style="margin-top:12px">Почему? Проверим на числах: <span class="m">2 &lt; 5</span> — верно. Умножим на −1: <span class="m">−2</span> и <span class="m">−5</span>. Но <span class="m">−2 &gt; −5</span>, значит знак пришлось перевернуть.</p>
+</div>
+
+<div class="panel">
+  <p style="margin-top:0"><b>Пример 1.</b> Делим на положительное число — знак не меняется.</p>
+  <div class="ex">
+    <div class="ln"><span class="m">2(3x − 2) &lt; 20</span></div>
+    <div class="ln"><span class="m">6x − 4 &lt; 20</span><span class="note">раскрыли скобки</span></div>
+    <div class="ln"><span class="m">6x &lt; 20 + 4</span><span class="note">число −4 перенесли вправо, стало +4</span></div>
+    <div class="ln"><span class="m">6x &lt; 24</span></div>
+    <div class="ln"><span class="m">x &lt; 4</span><span class="note">делим на 6 (плюс) — знак тот же</span></div>
+  </div>
+  <p style="margin-bottom:0;margin-top:16px"><b>Пример 2.</b> Делим на отрицательное число — знак переворачивается.</p>
+  <div class="ex">
+    <div class="ln"><span class="m">21 − 4x ≤ 9</span></div>
+    <div class="ln"><span class="m">−4x ≤ 9 − 21</span><span class="note">21 перенесли вправо, стало −21</span></div>
+    <div class="ln"><span class="m">−4x ≤ −12</span></div>
+    <div class="ln"><span class="m">x ≥ 3</span><span class="flip">делим на −4 — знак ≤ меняем на ≥</span></div>
+  </div>
+  <p style="margin-bottom:0;margin-top:16px"><b>Совет.</b> Иксы можно переносить туда, где их больше, тогда коэффициент будет положительным и знак менять не придётся: <span class="m">2x + 1 ≤ 3x − 7</span> → <span class="m">1 + 7 ≤ 3x − 2x</span> → <span class="m">8 ≤ x</span>, то есть <span class="m">x ≥ 8</span>.</p>
+</div>
+
+<div class="toolbar">
+  <span class="score" id="score">Решено верно: 0 из 32</span>
+  <span style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn primary" id="checkAll">Проверить всё</button>
+    <button class="btn" id="reset">Очистить</button>
+  </span>
+</div>
+
+<h2>Задание 2. Реши неравенства</h2>
+<div class="tasks" id="t2"></div>
+
+<h2>Задание 3. Реши неравенства</h2>
+<p class="hand" style="margin-top:-4px">Здесь почти везде придётся делить на отрицательное число — следи за знаком!</p>
+<div class="tasks" id="t3"></div>
+
+</div>
+<script>
+const T2 = [
+ ["a","3x ≤ 12","≤",4,["3x ≤ 12","x ≤ 12 : 3","x ≤ 4"]],
+ ["b","x + 4 > 10",">",6,["x > 10 − 4","x > 6"]],
+ ["c","x − 3 ≤ 7","≤",10,["x ≤ 7 + 3","x ≤ 10"]],
+ ["d","2x + 5 < 19","<",7,["2x < 19 − 5","2x < 14","x < 7"]],
+ ["e","3x − 2 > 4",">",2,["3x > 4 + 2","3x > 6","x > 2"]],
+ ["f","2x + 7 ≤ 25","≤",9,["2x ≤ 25 − 7","2x ≤ 18","x ≤ 9"]],
+ ["g","5x + 4 ≥ 39","≥",7,["5x ≥ 39 − 4","5x ≥ 35","x ≥ 7"]],
+ ["h","2x − 5 > 6",">",5.5,["2x > 6 + 5","2x > 11","x > 5,5"]],
+ ["i","3(x + 1) ≤ 24","≤",7,["3x + 3 ≤ 24","3x ≤ 21","x ≤ 7"]],
+ ["j","2(3x − 2) < 20","<",4,["6x − 4 < 20","6x < 24","x < 4"]],
+ ["k","5(2x + 3) ≥ 55","≥",4,["10x + 15 ≥ 55","10x ≥ 40","x ≥ 4"]],
+ ["l","½x < 6","<",12,["½x < 6","x < 6 · 2 (умножаем на 2)","x < 12"]],
+ ["m","3x + 1 < 2x + 5","<",4,["3x − 2x < 5 − 1","x < 4"]],
+ ["n","5x − 3 ≥ 2x + 18","≥",7,["5x − 2x ≥ 18 + 3","3x ≥ 21","x ≥ 7"]],
+ ["o","2x + 1 ≤ 3x − 7","≥",8,["2x − 3x ≤ −7 − 1","−x ≤ −8","!x ≥ 8 (делим на −1, знак меняем)"]],
+ ["p","3(5x + 2) < 11(x + 2)","<",4,["15x + 6 < 11x + 22","15x − 11x < 22 − 6","4x < 16","x < 4"]],
+ ["q","2(3x − 1) > 3x + 4",">",2,["6x − 2 > 3x + 4","6x − 3x > 4 + 2","3x > 6","x > 2"]],
+ ["r","5(2x + 1) ≤ 5(x + 1)","≤",0,["10x + 5 ≤ 5x + 5","10x − 5x ≤ 5 − 5","5x ≤ 0","x ≤ 0"]],
+ ["s","4(3x − 1) ≥ 5(2x + 3)","≥",9.5,["12x − 4 ≥ 10x + 15","12x − 10x ≥ 15 + 4","2x ≥ 19","x ≥ 9,5"]],
+ ["t","5(3x − 7) < 4(3x − 5)","<",5,["15x − 35 < 12x − 20","15x − 12x < −20 + 35","3x < 15","x < 5"]]
+];
+const T3 = [
+ ["a","10 − x < 6",">",4,["−x < 6 − 10","−x < −4","!x > 4 (делим на −1, знак меняем)"]],
+ ["b","8 − x > 5","<",3,["−x > 5 − 8","−x > −3","!x < 3 (делим на −1, знак меняем)"]],
+ ["c","24 − x ≥ 10","≤",14,["−x ≥ 10 − 24","−x ≥ −14","!x ≤ 14 (делим на −1, знак меняем)"]],
+ ["d","10 − 2x > 8","<",1,["−2x > 8 − 10","−2x > −2","!x < 1 (делим на −2, знак меняем)"]],
+ ["e","9 − 2x < 1",">",4,["−2x < 1 − 9","−2x < −8","!x > 4 (делим на −2, знак меняем)"]],
+ ["f","21 − 4x ≤ 9","≥",3,["−4x ≤ 9 − 21","−4x ≤ −12","!x ≥ 3 (делим на −4, знак меняем)"]],
+ ["g","3(6 − x) ≤ 6","≥",4,["18 − 3x ≤ 6","−3x ≤ 6 − 18","−3x ≤ −12","!x ≥ 4 (делим на −3, знак меняем)"]],
+ ["h","5(10 − 3x) ≤ 20","≥",2,["50 − 15x ≤ 20","−15x ≤ 20 − 50","−15x ≤ −30","!x ≥ 2 (делим на −15, знак меняем)"]],
+ ["i","7(9 − 2x) ≥ 21","≤",3,["63 − 14x ≥ 21","−14x ≥ 21 − 63","−14x ≥ −42","!x ≤ 3 (делим на −14, знак меняем)"]],
+ ["j","8(12 − 5x) < 16",">",2,["96 − 40x < 16","−40x < 16 − 96","−40x < −80","!x > 2 (делим на −40, знак меняем)"]],
+ ["k","10 − 3x < 2x",">",2,["−3x − 2x < −10","−5x < −10","!x > 2 (делим на −5, знак меняем)"]],
+ ["l","5(3 − x) > 30","<",-3,["15 − 5x > 30","−5x > 30 − 15","−5x > 15","!x < −3 (делим на −5, знак меняем)"]]
+];
+const all = [];
+function parseNum(s){
+  s = s.trim().replace(/\s/g,"").replace("−","-").replace(",",".");
+  if(!s) return NaN;
+  if(s.includes("/")){const [a,b]=s.split("/");return parseFloat(a)/parseFloat(b);}
+  return Number(s);
+}
+function build(list, el){
+  list.forEach(([l,q,sign,val,steps])=>{
+    const d=document.createElement("div"); d.className="task";
+    d.innerHTML=`<div class="q"><b>${l})</b><span class="m">${q}</span></div>
+      <div class="ans"><span>x</span>
+        <select aria-label="Знак ответа к ${l}"><option value="">?</option><option>&lt;</option><option>&gt;</option><option>≤</option><option>≥</option></select>
+        <input inputmode="decimal" aria-label="Число в ответе к ${l}" placeholder="число">
+        <button class="btn">Проверить</button></div>
+      <div class="fb" aria-live="polite"></div>
+      <button class="linkbtn">Показать решение</button>
+      <div class="sol" hidden>${steps.map(s=>s[0]==="!"?`<div class="flip">${s.slice(1)}</div>`:`<div>${s}</div>`).join("")}</div>`;
+    const sel=d.querySelector("select"), inp=d.querySelector("input"), fb=d.querySelector(".fb"), sol=d.querySelector(".sol"), lb=d.querySelector(".linkbtn");
+    const item={d,sel,inp,fb,sign,val,state:null};
+    item.check=()=>{
+      const n=parseNum(inp.value);
+      if(!sel.value||isNaN(n)){ if(sel.value||inp.value){fb.className="fb bad";fb.textContent="Выбери знак и введи число.";} return;}
+      const ok = sel.value===sign && Math.abs(n-val)<1e-9;
+      d.classList.toggle("ok",ok); d.classList.toggle("bad",!ok);
+      fb.className="fb "+(ok?"ok":"bad");
+      if(ok) fb.textContent="Верно!";
+      else if(Math.abs(n-val)<1e-9) fb.textContent="Число верное, а знак нет. Делил на отрицательное?";
+      else fb.textContent="Пока неверно. Проверь перенос и знаки.";
+      item.state=ok; score();
+    };
+    d.querySelector(".ans .btn").onclick=item.check;
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")item.check();});
+    lb.onclick=()=>{sol.hidden=!sol.hidden; lb.textContent=sol.hidden?"Показать решение":"Скрыть решение";};
+    el.appendChild(d); all.push(item);
+  });
+}
+function score(){
+  const n=all.filter(i=>i.state===true).length;
+  document.getElementById("score").textContent=`Решено верно: ${n} из ${all.length}`;
+}
+build(T2,document.getElementById("t2"));
+build(T3,document.getElementById("t3"));
+document.getElementById("checkAll").onclick=()=>all.forEach(i=>i.check());
+document.getElementById("reset").onclick=()=>{all.forEach(i=>{i.sel.value="";i.inp.value="";i.fb.textContent="";i.d.classList.remove("ok","bad");i.state=null;});score();};
+</script>
+</body>
+</html>
