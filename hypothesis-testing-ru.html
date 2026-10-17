@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Проверка гипотез — шпаргалка</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+:root {
+  --bg:#f7f4f0; --card:#fff;
+  --pink:#e84fa3; --pink-light:#fde8f4; --pink-mid:#f9c9e8;
+  --purple:#7c5cbf; --purple-light:#ede8f8;
+  --green:#17a06b; --green-light:#e3f5eb;
+  --red:#d43030; --red-light:#fde8e8;
+  --orange:#d45e10; --orange-light:#fff1e6;
+  --ink:#1a1228; --muted:#7a6e82; --border:#e5dff0;
+  --mono:'JetBrains Mono',monospace;
+  --display:'DM Serif Display',serif;
+  --body:'Space Grotesk',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);padding:48px 24px;}
+.page{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:28px;}
+.katex{font-size:1.05em;}
+
+.header{display:flex;align-items:center;justify-content:space-between;padding:32px 36px;background:var(--ink);border-radius:20px;position:relative;overflow:hidden;gap:20px;}
+.header::before{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:var(--pink);opacity:0.15;}
+.header::after{content:'';position:absolute;right:40px;bottom:-80px;width:160px;height:160px;border-radius:50%;background:var(--purple);opacity:0.2;}
+.header-text{position:relative;z-index:1;}
+.header-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--pink);margin-bottom:6px;}
+.header-title{font-family:var(--display);font-size:38px;color:#fff;line-height:1.1;}
+.header-title span{color:var(--pink);}
+.header-badge{position:relative;z-index:1;background:var(--pink);color:#fff;font-family:var(--mono);font-size:12px;font-weight:500;padding:8px 16px;border-radius:50px;white-space:nowrap;}
+
+.section-label{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+.section-label::before{content:'';display:block;width:24px;height:2px;background:var(--pink);border-radius:2px;}
+.divider{height:2px;background:linear-gradient(90deg,var(--pink),var(--purple));border-radius:2px;opacity:0.25;}
+
+.chapter-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.chapter-item{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:10px;}
+.chapter-num{font-family:var(--mono);font-size:11px;color:var(--pink);background:var(--pink-light);border-radius:8px;padding:4px 8px;white-space:nowrap;font-weight:500;}
+.chapter-name{font-size:12px;font-weight:600;color:var(--ink);line-height:1.3;}
+
+.def-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:26px 30px;display:flex;gap:24px;align-items:flex-start;}
+.def-text{flex:1;}
+.def-text h3{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px;}
+.def-text p{font-size:13.5px;color:var(--muted);line-height:1.65;}
+.def-text p strong{color:var(--ink);}
+.def-formula-box{background:var(--pink-light);border:2px solid var(--pink-mid);border-radius:14px;padding:18px 22px;font-size:18px;text-align:center;flex-shrink:0;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* SCENARIO CARDS */
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.scenario-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;}
+.scenario-card.sc-pink{background:var(--pink-light);border-color:var(--pink-mid);}
+.scenario-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+.scenario-formula{font-size:15px;color:var(--ink);}
+.scenario-note{font-size:11.5px;color:var(--muted);line-height:1.5;}
+
+/* TABLE */
+.table-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;}
+.table-head-dark{background:var(--ink);padding:16px 22px;}
+.table-head-dark h3{color:#fff;font-size:14px;font-weight:700;}
+.table-head-dark p{color:rgba(255,255,255,0.45);font-size:11px;margin-top:2px;}
+.geo-table{width:100%;border-collapse:collapse;}
+.geo-table th{background:var(--purple-light);padding:10px 16px;text-align:center;font-size:12px;font-weight:700;color:var(--purple);border-bottom:1.5px solid var(--border);border-right:1px solid var(--border);}
+.geo-table th:first-child{background:#5c4a7a;color:#fff;}
+.geo-table th:last-child{border-right:none;}
+.geo-table td{padding:11px 16px;text-align:center;border-bottom:1px solid var(--border);border-right:1px solid var(--border);font-size:14px;color:var(--ink);}
+.geo-table td:first-child{background:#5c4a7a;color:#fff;font-weight:700;}
+.geo-table td:last-child{border-right:none;}
+.geo-table tr:last-child td{border-bottom:none;}
+.geo-table tr:hover td:not(:first-child){background:#faf8ff;}
+
+/* FORMULA MEGA GRID */
+.formula-mega{background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;}
+.formula-mega-head{padding:18px 26px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.fmh-pink{background:var(--pink-light);}
+.fmh-purple{background:var(--purple-light);}
+.fm-badge{font-family:var(--mono);font-size:11px;font-weight:700;padding:4px 12px;border-radius:8px;color:#fff;}
+.fm-b-pink{background:var(--pink);}
+.fm-b-purple{background:var(--purple);}
+.fm-title{font-size:14px;font-weight:700;color:var(--ink);}
+.fm-sub{font-size:12px;color:var(--muted);}
+.formula-grid-body{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.fg-cell{padding:16px 22px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+.fg-cell:nth-child(2n){border-right:none;}
+.fg-cell:nth-last-child(-n+2){border-bottom:none;}
+.fg-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+.fg-formula{font-size:16px;color:var(--ink);line-height:1.5;}
+
+/* VS COMPARISON */
+.vs-wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch;}
+.vs-card{background:var(--card);border:1.5px solid var(--border);overflow:hidden;}
+.vs-card.left{border-radius:20px 0 0 20px;border-right:none;}
+.vs-card.right{border-radius:0 20px 20px 0;}
+.vs-head{padding:16px 22px;display:flex;align-items:center;gap:12px;}
+.vs-head.vh-pink{background:var(--pink);}
+.vs-head.vh-purple{background:var(--purple);}
+.vs-head-title{color:#fff;font-size:15px;font-weight:700;}
+.vs-head-sub{color:rgba(255,255,255,0.7);font-size:11px;font-family:var(--mono);}
+.vs-body{padding:20px 22px;display:flex;flex-direction:column;gap:12px;}
+.vs-row{display:flex;flex-direction:column;gap:4px;}
+.vs-row-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);}
+.vs-row-val{font-size:13.5px;color:var(--ink);line-height:1.5;}
+.vs-divider{width:2px;background:linear-gradient(180deg,var(--pink),var(--purple));opacity:0.3;}
+
+/* NOTE BOX */
+.note-box{border-radius:16px;padding:18px 24px;display:flex;align-items:flex-start;gap:14px;}
+.note-box.nb-pink{background:var(--pink-light);border:1.5px solid var(--pink-mid);}
+.note-box.nb-ink{background:var(--ink);}
+.note-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.note-body h4{font-size:13px;font-weight:700;margin-bottom:5px;}
+.note-box.nb-pink .note-body h4{color:var(--pink);}
+.note-box.nb-ink .note-body h4{color:var(--pink);}
+.note-body p{font-size:13px;color:var(--muted);line-height:1.6;}
+.note-box.nb-ink .note-body p{color:rgba(255,255,255,0.75);}
+.note-body p strong{color:var(--ink);}
+.note-box.nb-ink .note-body p strong{color:#fff;}
+
+/* CRITERIA LIST */
+.criteria-list{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:20px 24px;display:flex;flex-direction:column;gap:10px;}
+.criteria-item{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;color:var(--ink);line-height:1.5;}
+.criteria-dot{width:8px;height:8px;border-radius:50%;background:var(--pink);flex-shrink:0;margin-top:6px;}
+
+/* WORKED EXAMPLES */
+.worked-header{background:linear-gradient(135deg,#1e0e35,#3a1f6e);border-radius:20px;padding:24px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.worked-header h2{color:#fff;font-size:17px;font-weight:700;margin-bottom:4px;}
+.worked-header p{color:rgba(255,255,255,0.5);font-size:12px;}
+.worked-badge{background:var(--pink);color:#fff;font-family:var(--mono);font-size:12px;font-weight:600;padding:8px 14px;border-radius:50px;white-space:nowrap;flex-shrink:0;}
+.parts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.part-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;}
+.part-head{padding:11px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.part-letter{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pl-pink{background:var(--pink);}
+.pl-purple{background:var(--purple);}
+.part-q{font-size:13px;font-weight:600;color:var(--ink);}
+.part-body{padding:14px 16px;display:flex;flex-direction:column;gap:8px;}
+.step{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;}
+.step-tag{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--bg);border-radius:4px;padding:2px 6px;flex-shrink:0;margin-top:2px;white-space:nowrap;}
+.step-text{color:var(--ink);line-height:1.6;}
+.ans-row{border-radius:10px;padding:9px 13px;display:flex;align-items:center;gap:8px;margin-top:4px;}
+.ans-pink{background:var(--pink-light);border:1.5px solid var(--pink-mid);}
+.ans-purple{background:var(--purple-light);border:1.5px solid #d0c4f0;}
+.ans-label{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+
+/* KEY FACTS */
+.facts-box{background:var(--ink);border-radius:20px;padding:24px 28px;display:flex;flex-direction:column;gap:14px;}
+.facts-title{color:var(--pink);font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;}
+.fact-row{display:flex;align-items:center;gap:14px;font-size:14px;color:#fff;}
+.fact-row .katex{color:#fff;}
+
+.footer{display:flex;justify-content:space-between;align-items:center;padding:0 4px;font-size:11px;color:var(--muted);font-family:var(--mono);}
+
+@media(max-width:640px){
+  .chapter-nav{grid-template-columns:1fr 1fr;}
+  .two-col,.parts-grid{grid-template-columns:1fr;}
+  .scenario-grid{grid-template-columns:1fr;}
+  .formula-grid-body{grid-template-columns:1fr;}
+  .vs-wrap{grid-template-columns:1fr;}
+  .vs-divider{width:100%;height:2px;}
+  .vs-card.left{border-radius:20px 20px 0 0;border-right:1.5px solid var(--border);border-bottom:none;}
+  .vs-card.right{border-radius:0 0 20px 20px;}
+  .header{flex-direction:column;align-items:flex-start;}
+  .header-title{font-size:30px;}
+}
+/* ── PHRASES TABLE ── */
+  .phrases-card{background: var(--card);
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    overflow: hidden;}
+.phrases-card-header{padding: 20px 28px;
+    background: linear-gradient(135deg, #1a1228 0%, #2d1f4a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;}
+.phrases-card-header h2{color: #fff;
+    font-size: 16px;
+    font-weight: 700;}
+.phrases-card-header p{color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    margin-top: 2px;}
+.phrases-card-header .icon{font-size: 24px;}
+td.phrase-cell{font-weight: 600;
+    color: var(--ink);}
+td.phrase-cell::before{content: '"';
+    color: var(--pink);
+    font-family: var(--display);
+    font-size: 16px;}
+td.phrase-cell::after{content: '"';
+    color: var(--pink);
+    font-family: var(--display);
+    font-size: 16px;}
+td.means-cell{font-family: var(--mono);
+    font-size: 13px;
+    color: var(--purple);
+    font-weight: 500;}
+td.calc-cell{font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink);}
+.pill{display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--mono);}
+.pill-sub{background: #fff0e8; color: #c05e1a;}
+.pill-direct{background: #e8f7f3; color: #187a5a;}
+.lookup-table-wrap{background: var(--card);
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    overflow: hidden;}
+.lookup-table-header{padding: 16px 24px;
+    background: var(--purple-light);
+    border-bottom: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;}
+.lookup-table-header h3{font-size: 14px;
+    font-weight: 700;
+    color: var(--purple);}
+.lookup-table-header span{font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);}
+.lookup-table{width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 12.5px;}
+.lookup-table th{background: var(--purple-light);
+    padding: 8px 14px;
+    text-align: center;
+    color: var(--purple);
+    font-weight: 700;
+    border-bottom: 1.5px solid var(--border);
+    border-right: 1px solid var(--border);
+    font-size: 12px;}
+.lookup-table th:first-child{text-align: left;}
+.lookup-table td{padding: 8px 14px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--ink);}
+.lookup-table td:first-child{text-align: left; font-weight: 600; color: var(--purple);}
+.lookup-table tr:last-child td{border-bottom: none;}
+.lookup-table td.highlighted{background: #fff0fb;
+    color: var(--pink);
+    font-weight: 700;
+    position: relative;}
+.lookup-table tr.n6-row td{color: var(--muted); background: #fafafa;}
+  .chapter-item{text-decoration:none;color:inherit;}
+
+  .phrases-card table{width:100%;border-collapse:collapse;}
+  .phrases-card thead{background:var(--purple-light);}
+  .phrases-card thead th{padding:12px 20px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--purple);text-align:left;border-bottom:1.5px solid var(--border);}
+  .phrases-card tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
+  .phrases-card tbody tr:last-child{border-bottom:none;}
+  .phrases-card tbody tr:hover{background:#faf8ff;}
+  .phrases-card tbody td{padding:13px 20px;font-size:13.5px;vertical-align:middle;}
+
+  .plain-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:26px 28px;}
+  .plain-lead,.plain-end{font-size:15px;line-height:1.6;color:var(--ink);}
+  .en-term{font-weight:700;color:var(--purple);}
+  .plain-quote{margin:14px 0 18px;padding:14px 18px;border-left:4px solid var(--pink);background:var(--pink-light);border-radius:0 14px 14px 0;font-weight:700;font-size:16px;line-height:1.5;color:var(--ink);}
+  .plain-quote.en{border-left-color:var(--purple);background:var(--purple-light);font-family:var(--mono);font-size:15px;color:var(--purple);}
+  .plain-sub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:4px 0 10px;}
+  .plain-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+  .plain-list li{display:flex;align-items:center;gap:10px;background:#faf8ff;border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-size:14px;line-height:1.4;}
+  .pl-ico{font-size:17px;flex:none;}
+  @media(max-width:640px){.plain-list{grid-template-columns:1fr;} .plain-card{padding:20px 18px;}}
+  .katex{position:relative;}
+  .chapter-nav{grid-template-columns:repeat(3,1fr);}
+  .tscroll .geo-table th,.tscroll .geo-table td{padding:10px 7px;font-size:13px;}
+  .tscroll .geo-table td:first-child,.tscroll .geo-table th:first-child{white-space:nowrap;padding:10px 12px;}
+  .def-formula-box{max-width:100%;overflow-x:auto;}
+  .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .tscroll .geo-table{min-width:560px;}
+  .geo-table td.hl-cell{background:var(--pink-light);color:var(--pink);font-weight:700;}
+  .phrases-card table{min-width:520px;}
+  .scenario-card.sc-purple{background:var(--purple-light);border:1.5px solid #d9cff0;}
+  .fg-note{font-size:12px;color:var(--muted);margin-top:4px;}
+  .fg-formula.big{font-size:18px;}
+  .formula-grid-body.one{grid-template-columns:1fr;}
+  .formula-grid-body.three{grid-template-columns:repeat(3,1fr);}
+  .parts-grid.three{grid-template-columns:repeat(3,1fr);}
+  .parts-grid.one{grid-template-columns:1fr;}
+  .ans-row.ans-bad{background:#ffe8ee;color:#b3244f;}
+  .criteria-num{flex:none;width:26px;height:26px;border-radius:8px;background:var(--pink);color:#fff;font-family:var(--mono);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .criteria-item:nth-child(even) .criteria-num{background:var(--purple);}
+  .chart-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:22px 24px;}
+  .chart-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+  .chart-head h3{font-family:var(--display);font-weight:400;font-size:20px;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted);}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;}
+  .chart-card svg{display:block;width:100%;height:auto;}
+  .ch-lbl{font-family:var(--mono);font-size:11px;fill:var(--muted);}
+  .ch-x{font-size:12px;fill:var(--ink);}
+  .chart-note{font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.55;}
+  .two-col>.note-box{height:100%;}
+  @media(max-width:760px){.parts-grid.three,.formula-grid-body.three{grid-template-columns:1fr;}}
+  @media(max-width:640px){.chapter-nav{grid-template-columns:1fr 1fr;} .def-card{flex-direction:column;align-items:stretch;} .def-formula-box{align-self:flex-start;}}
+
+</style>
+<style>
+  .plain-list{grid-template-columns:1fr;}
+  .plain-list li{align-items:flex-start;}
+  .pl-txt{display:block;}
+  .pl-ico{margin-top:1px;}
+  .grid-terms{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .term-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:18px 20px;}
+  .term-card:nth-child(4n+1),.term-card:nth-child(4n+4){background:var(--pink-light);border-color:var(--pink-mid);}
+  .term-card:nth-child(4n+2),.term-card:nth-child(4n+3){background:var(--purple-light);border-color:var(--purple-mid);}
+  .term-en{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);}
+  .term-card:nth-child(4n+2) .term-en,.term-card:nth-child(4n+3) .term-en{color:var(--purple);}
+  .term-card h4{font-family:var(--display);font-weight:400;font-size:19px;margin:5px 0 7px;}
+  .term-card p{font-size:14.5px;line-height:1.6;color:var(--ink-2);}
+  .grid-tails{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .tail-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:16px 16px 18px;text-align:center;}
+  .tail-head{font-size:16px;margin-bottom:4px;}
+  .tail-card svg{display:block;width:100%;height:auto;}
+  .tail-name{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--pink);font-weight:700;}
+  .tail-note{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.45;}
+  .verdict-card{border-radius:20px;padding:20px 22px;border:1.5px solid var(--border);height:100%;}
+  .verdict-card.ok{background:var(--pink-light);border-color:var(--pink-mid);}
+  .verdict-card.no{background:var(--purple-light);border-color:var(--purple-mid);}
+  .verdict-tag{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--pink);}
+  .verdict-card.no .verdict-tag{color:var(--purple);}
+  .verdict-card h4{font-family:var(--display);font-weight:400;font-size:21px;margin:4px 0 8px;}
+  .verdict-en{font-family:var(--mono);font-size:13px;color:var(--ink);background:rgba(255,255,255,.7);border-radius:10px;padding:8px 11px;margin-bottom:10px;}
+  .verdict-card p{font-size:14.5px;line-height:1.6;color:var(--ink-2);}
+  .err-matrix{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;}
+  .em-h{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;}
+  .em-h.rh{justify-content:flex-start;text-align:left;}
+  .em-cell{border-radius:16px;padding:16px;border:1.5px solid var(--border);background:var(--card);text-align:center;}
+  .em-cell.bad{background:var(--pink-light);border-color:var(--pink-mid);}
+  .em-cell.good{background:#e8f7f3;border-color:#bfe6da;}
+  .em-title{font-weight:700;font-size:15px;}
+  .em-cell.bad .em-title{color:var(--pink-deep);}
+  .em-cell.good .em-title{color:#187a5a;}
+  .em-sub{font-size:12.5px;color:var(--muted);margin-top:4px;}
+  .fg-formula.big{font-size:19px;}
+  .mis{border:1.5px solid var(--border);border-radius:20px;padding:16px 18px;background:var(--card);}
+  .mis .bad{font-size:15px;margin:9px 0 4px;color:#b3244f;}
+  .mis .good{font-size:15px;color:#187a5a;}
+  .pill.warn{background:#ffe3ea;color:#b3244f;display:inline-block;padding:3px 11px;border-radius:20px;font-family:var(--mono);font-size:11px;font-weight:700;}
+  .lookup-table td{font-size:14.5px;}
+  .fact-row{overflow-x:auto;}
+  @media(max-width:760px){.grid-terms,.grid-tails{grid-template-columns:1fr;}
+    .err-matrix{grid-template-columns:1fr 1fr;} .em-h.corner{display:none;}
+    .em-h.rh{grid-column:1 / -1;padding:6px 2px 0;}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="header">
+  <div class="header-text">
+    <div class="header-eyebrow">Статистика · Topic 4B</div>
+    <h1 class="header-title">Проверка<br><span>гипотез</span></h1>
+  </div>
+  <div class="header-badge">p-value &lt; α → reject H₀</div>
+</header>
+
+<nav class="chapter-nav">
+  <a class="chapter-item" href="#s1"><span class="chapter-num">§1</span><span class="chapter-name">Главная идея</span></a>
+  <a class="chapter-item" href="#s2"><span class="chapter-num">§2</span><span class="chapter-name">Словарь терминов</span></a>
+  <a class="chapter-item" href="#s3"><span class="chapter-num">§3</span><span class="chapter-name">Правило решения</span></a>
+  <a class="chapter-item" href="#s4"><span class="chapter-num">§4</span><span class="chapter-name">One- vs two-tailed</span></a>
+  <a class="chapter-item" href="#s5"><span class="chapter-num">§5</span><span class="chapter-name">Как писать вывод</span></a>
+  <a class="chapter-item" href="#s6"><span class="chapter-num">§6</span><span class="chapter-name">Семь тестов</span></a>
+  <a class="chapter-item" href="#s7"><span class="chapter-num">§7</span><span class="chapter-name">Ошибки I и II рода</span></a>
+  <a class="chapter-item" href="#s8"><span class="chapter-num">§8</span><span class="chapter-name">Примеры и ловушки</span></a>
+</nav>
+
+<!-- §1 -->
+<div class="section-label" id="s1">§1 · Главная идея за одну минуту</div>
+<div class="def-card">
+  <div class="def-text">
+    <h3>Inferential statistics</h3>
+    <p>Мы изучаем <strong>маленькую выборку</strong> <span class="en-term">(sample)</span> и делаем вывод о <strong>всей генеральной совокупности</strong> <span class="en-term">(population)</span>. Например, по выборочному среднему \(\bar{x}\) судим о среднем популяции \(\mu\).</p>
+  </div>
+  <div class="def-formula-box">\(\bar{x}\;\longrightarrow\;\mu\)</div>
+</div>
+
+<div class="plain-card">
+  <p class="plain-lead">Вся логика проверки гипотезы умещается в четыре шага:</p>
+  <ul class="plain-list">
+    <li><span class="pl-ico">1️⃣</span><span class="pl-txt">Есть <strong>утверждение</strong> о параметре популяции: «средний вес 75 кг»</span></li>
+    <li><span class="pl-ico">2️⃣</span><span class="pl-txt">Записываем <strong>H₀ и H₁</strong></span></li>
+    <li><span class="pl-ico">3️⃣</span><span class="pl-txt">Смотрим на выборку: результат <strong>достаточно близок</strong> к утверждению?</span></li>
+    <li><span class="pl-ico">4️⃣</span><span class="pl-txt">Если нет — <strong>отвергаем H₀</strong>; если да — <strong>не хватает доказательств</strong>, чтобы её отвергнуть</span></li>
+  </ul>
+  <p class="plain-end">А «достаточно близок» задаёт одно число — <strong>уровень значимости α</strong>.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- §2 -->
+<div class="section-label" id="s2">§2 · Словарь терминов</div>
+
+<div class="grid-terms">
+  <div class="term-card">
+    <div class="term-en">Null hypothesis</div>
+    <h4>H₀ — нулевая гипотеза</h4>
+    <p>Само утверждение, всегда со <strong>знаком равенства</strong>: \(\mu=\mu_0\), \(p=p_0\), \(\rho=0\), «признаки независимы». Это то, что мы пытаемся опровергнуть.</p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">Alternative hypothesis</div>
+    <h4>H₁ — альтернативная гипотеза</h4>
+    <p>Отрицание H₀: \(\mu\neq\mu_0\), либо \(\mu&gt;\mu_0\), либо \(\mu&lt;\mu_0\). Именно H₁ решает, будет тест двусторонним или односторонним.</p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">Significance level</div>
+    <h4>α — уровень значимости</h4>
+    <p>Планка «насколько далеко — уже слишком далеко». Обычно \(10\%,\,5\%,\,1\%\), то есть \(\alpha=0{,}10;\;0{,}05;\;0{,}01\). <strong>В задаче всегда указан явно.</strong> По смыслу это вероятность отвергнуть H₀, когда она верна.</p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">p-value</div>
+    <h4>p-значение</h4>
+    <p>Число от 0 до 1, которое выдаёт калькулятор. Чем оно <strong>меньше</strong>, тем сильнее выборка противоречит H₀. Сравниваем только с α.</p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">Test statistic</div>
+    <h4>Статистика критерия</h4>
+    <p>Второе число от GDC: \(z\), \(t\) или \(\chi^2\). Показывает, на сколько «стандартных шагов» выборка отошла от H₀.</p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">Critical value</div>
+    <h4>Критическое значение</h4>
+    <p>Граница, с которой сравнивают статистику: \(z_{\text{crit}}\), \(t_{\text{crit}}\), \(\chi^2_{\text{crit}}\). Зависит от α (и от df). <strong>Обычно даётся в условии.</strong></p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">Critical region</div>
+    <h4>Критическая область</h4>
+    <p>Множество значений, при которых H₀ отвергается. Зависит <strong>только от α</strong>, а не от конкретной выборки. Остальное — <strong>область принятия</strong> <span class="en-term">(acceptance region)</span>.</p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">Degrees of freedom</div>
+    <h4>df — степени свободы</h4>
+    <p>Для таблицы \(m\times n\): \(\text{df}=(m-1)(n-1)\). Для GOF: \(\text{df}=k-1\). Влияют на p-value и критическое значение.</p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">Type I error</div>
+    <h4>Ошибка I рода</h4>
+    <p>Отвергли H₀, <strong>хотя она верна</strong>. Её вероятность и есть α — то есть мы сами её выбираем.</p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">Type II error</div>
+    <h4>Ошибка II рода</h4>
+    <p>Приняли H₀, <strong>хотя она ложна</strong>. Считается уже по <em>настоящему</em> значению параметра \(\mu_1\), \(\lambda_1\) или \(p_1\).</p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">Expected frequencies</div>
+    <h4>Ожидаемые частоты</h4>
+    <p>Что было бы при верной H₀: \(f_{\text{exp}}=\dfrac{(\text{итог строки})\times(\text{итог столбца})}{\text{общий итог}}\). Сравниваем с наблюдёнными \(f_{\text{obs}}\).</p>
+  </div>
+  <div class="term-card">
+    <div class="term-en">Confidence interval</div>
+    <h4>Доверительный интервал</h4>
+    <p>Интервал \([L;U]\) для \(\mu\). «95 % уверены, что интервал <strong>накрывает</strong> \(\mu\)»: из 100 таких выборок примерно 95 интервалов содержат \(\mu\).</p>
+  </div>
+</div>
+
+<div class="note-box nb-ink">
+  <div class="note-icon">🎯</div>
+  <div class="note-body">
+    <h4>Три числа, которые путают чаще всего</h4>
+    <p><strong>α</strong> выбираем мы (дано в условии) · <strong>p-value</strong> считает калькулятор по выборке · <strong>критическое значение</strong> зависит от α и df, но не от выборки. Сравнивать можно только «α ↔ p-value» и «критическое ↔ статистика». Крест-накрест — нельзя.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §3 -->
+<div class="section-label" id="s3">§3 · Правило решения</div>
+<div class="formula-mega">
+  <div class="formula-mega-head fmh-pink">
+    <div>
+      <div class="fm-title">Два эквивалентных способа</div>
+      <div class="fm-sub">На практике почти всегда берут p-value</div>
+    </div>
+    <span class="fm-badge fm-b-pink">Reject H₀</span>
+  </div>
+  <div class="formula-grid-body">
+    <div class="fg-cell">
+      <div class="fg-label">1 · По p-value</div>
+      <div class="fg-formula big">\(p\text{-value}&lt;\alpha\;\Rightarrow\;\text{reject } H_0\)</div>
+      <div class="fg-note">Если \(p\ge\alpha\) — не хватает доказательств отвергнуть H₀</div>
+    </div>
+    <div class="fg-cell">
+      <div class="fg-label">2 · По статистике</div>
+      <div class="fg-formula big">\(|z|&gt;z_{\text{crit}}\;\Rightarrow\;\text{reject } H_0\)</div>
+      <div class="fg-note">Так же для \(|t|&gt;t_{\text{crit}}\) и \(\chi^2&gt;\chi^2_{\text{crit}}\)</div>
+    </div>
+  </div>
+</div>
+
+<div class="note-box nb-pink">
+  <div class="note-icon">🧭</div>
+  <div class="note-body">
+    <h4>Мнемоника</h4>
+    <p><strong>«p маленькое — H₀ падает»</strong>. И наоборот: большая статистика (далеко от центра) — тоже повод отвергнуть H₀. Маленькое p и большая статистика всегда идут вместе.</p>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <div class="table-head-dark">
+    <h3>Как меняется вывод при разных α</h3>
+    <p>Одна и та же выборка, p-value = 0,041 и p-value = 0,082</p>
+  </div>
+  <div class="tscroll">
+  <table class="geo-table">
+    <thead><tr><th>α</th><th>p = 0,041</th><th>p = 0,082</th></tr></thead>
+    <tbody>
+      <tr><td>0,10</td><td class="hl-cell">отвергаем H₀</td><td class="hl-cell">отвергаем H₀</td></tr>
+      <tr><td>0,05</td><td class="hl-cell">отвергаем H₀</td><td>не отвергаем</td></tr>
+      <tr><td>0,01</td><td>не отвергаем</td><td>не отвергаем</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="note-box nb-ink">
+  <div class="note-icon">⚠️</div>
+  <div class="note-body">
+    <h4>Вывод зависит от α — это нормально</h4>
+    <p>Чем меньше α, тем труднее отвергнуть H₀. При α = 0,01 мы требуем более веских доказательств, чем при α = 0,10. Поэтому α всегда указывают в условии, а в ответе на него ссылаются.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §4 -->
+<div class="section-label" id="s4">§4 · One-tailed vs two-tailed</div>
+<div class="def-card">
+  <div class="def-text">
+    <h3>Хвост задаёт H₁</h3>
+    <p>Смотрим только на знак в альтернативной гипотезе. Знак \(\neq\) — <strong>два хвоста</strong>, знаки \(&gt;\) или \(&lt;\) — <strong>один хвост</strong>. Сама H₀ всегда одна и та же.</p>
+  </div>
+  <div class="def-formula-box">\(H_1:\;\mu\neq\mu_0\)</div>
+</div>
+
+<div class="grid-tails">
+  <div class="tail-card">
+    <div class="tail-head">\(H_1:\;\mu&lt;\mu_0\)</div>
+    <svg viewBox="0 0 300 150" role="img" aria-label="Критическая область слева">
+<path d="M20.0,118 L20.0,117.2 L22.2,117.1 L24.3,117.0 L26.5,116.8 L28.7,116.6 L30.8,116.4 L33.0,116.1 L35.2,115.8 L37.3,115.5 L39.5,115.1 L41.7,114.7 L43.8,114.2 L46.0,113.7 L48.2,113.1 L50.3,112.5 L52.5,111.8 L54.7,111.0 L56.8,110.1 L59.0,109.2 L61.2,108.2 L63.3,107.1 L65.5,105.8 L67.7,104.5 L69.8,103.1 L72.0,101.6 L74.2,100.0 L76.3,98.2 L78.5,96.4 L78.5,118 Z" fill="var(--pink)" opacity="0.75"/>
+<path d="M20.0,117.2 L22.2,117.1 L24.3,117.0 L26.5,116.8 L28.7,116.6 L30.8,116.4 L33.0,116.1 L35.2,115.8 L37.3,115.5 L39.5,115.1 L41.7,114.7 L43.8,114.2 L46.0,113.7 L48.2,113.1 L50.3,112.5 L52.5,111.8 L54.7,111.0 L56.8,110.1 L59.0,109.2 L61.2,108.2 L63.3,107.1 L65.5,105.8 L67.7,104.5 L69.8,103.1 L72.0,101.6 L74.2,100.0 L76.3,98.2 L78.5,96.4 L80.7,94.4 L82.8,92.4 L85.0,90.2 L87.2,88.0 L89.3,85.6 L91.5,83.1 L93.7,80.6 L95.8,77.9 L98.0,75.3 L100.2,72.5 L102.3,69.7 L104.5,66.8 L106.7,64.0 L108.8,61.1 L111.0,58.2 L113.2,55.4 L115.3,52.6 L117.5,49.8 L119.7,47.1 L121.8,44.5 L124.0,42.0 L126.2,39.7 L128.3,37.5 L130.5,35.4 L132.7,33.5 L134.8,31.8 L137.0,30.3 L139.2,29.0 L141.3,27.9 L143.5,27.1 L145.7,26.5 L147.8,26.1 L150.0,26.0 L152.2,26.1 L154.3,26.5 L156.5,27.1 L158.7,27.9 L160.8,29.0 L163.0,30.3 L165.2,31.8 L167.3,33.5 L169.5,35.4 L171.7,37.5 L173.8,39.7 L176.0,42.0 L178.2,44.5 L180.3,47.1 L182.5,49.8 L184.7,52.6 L186.8,55.4 L189.0,58.2 L191.2,61.1 L193.3,64.0 L195.5,66.8 L197.7,69.7 L199.8,72.5 L202.0,75.3 L204.2,77.9 L206.3,80.6 L208.5,83.1 L210.7,85.6 L212.8,88.0 L215.0,90.2 L217.2,92.4 L219.3,94.4 L221.5,96.4 L223.7,98.2 L225.8,100.0 L228.0,101.6 L230.2,103.1 L232.3,104.5 L234.5,105.8 L236.7,107.1 L238.8,108.2 L241.0,109.2 L243.2,110.1 L245.3,111.0 L247.5,111.8 L249.7,112.5 L251.8,113.1 L254.0,113.7 L256.2,114.2 L258.3,114.7 L260.5,115.1 L262.7,115.5 L264.8,115.8 L267.0,116.1 L269.2,116.4 L271.3,116.6 L273.5,116.8 L275.7,117.0 L277.8,117.1 L280.0,117.2" fill="none" stroke="var(--purple)" stroke-width="2.5"/>
+<line x1="14" y1="118" x2="290" y2="118" stroke="var(--muted)" stroke-width="1.5"/>
+<line x1="150" y1="118" x2="150" y2="24" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="150" y="136" text-anchor="middle" class="ch-lbl ch-x">μ₀</text>
+<text x="50" y="68" text-anchor="middle" class="ch-lbl ch-x" fill="var(--pink)">α</text>
+</svg>
+    <div class="tail-name">one-tailed (left)</div>
+    <div class="tail-note">Критическая область — слева, вся площадь \(\alpha\)</div>
+  </div>
+  <div class="tail-card">
+    <div class="tail-head">\(H_1:\;\mu&gt;\mu_0\)</div>
+    <svg viewBox="0 0 300 150" role="img" aria-label="Критическая область справа">
+<path d="M221.5,118 L221.5,96.4 L223.7,98.2 L225.8,100.0 L228.0,101.6 L230.2,103.1 L232.3,104.5 L234.5,105.8 L236.7,107.1 L238.8,108.2 L241.0,109.2 L243.2,110.1 L245.3,111.0 L247.5,111.8 L249.7,112.5 L251.8,113.1 L254.0,113.7 L256.2,114.2 L258.3,114.7 L260.5,115.1 L262.7,115.5 L264.8,115.8 L267.0,116.1 L269.2,116.4 L271.3,116.6 L273.5,116.8 L275.7,117.0 L277.8,117.1 L280.0,117.2 L280.0,118 Z" fill="var(--pink)" opacity="0.75"/>
+<path d="M20.0,117.2 L22.2,117.1 L24.3,117.0 L26.5,116.8 L28.7,116.6 L30.8,116.4 L33.0,116.1 L35.2,115.8 L37.3,115.5 L39.5,115.1 L41.7,114.7 L43.8,114.2 L46.0,113.7 L48.2,113.1 L50.3,112.5 L52.5,111.8 L54.7,111.0 L56.8,110.1 L59.0,109.2 L61.2,108.2 L63.3,107.1 L65.5,105.8 L67.7,104.5 L69.8,103.1 L72.0,101.6 L74.2,100.0 L76.3,98.2 L78.5,96.4 L80.7,94.4 L82.8,92.4 L85.0,90.2 L87.2,88.0 L89.3,85.6 L91.5,83.1 L93.7,80.6 L95.8,77.9 L98.0,75.3 L100.2,72.5 L102.3,69.7 L104.5,66.8 L106.7,64.0 L108.8,61.1 L111.0,58.2 L113.2,55.4 L115.3,52.6 L117.5,49.8 L119.7,47.1 L121.8,44.5 L124.0,42.0 L126.2,39.7 L128.3,37.5 L130.5,35.4 L132.7,33.5 L134.8,31.8 L137.0,30.3 L139.2,29.0 L141.3,27.9 L143.5,27.1 L145.7,26.5 L147.8,26.1 L150.0,26.0 L152.2,26.1 L154.3,26.5 L156.5,27.1 L158.7,27.9 L160.8,29.0 L163.0,30.3 L165.2,31.8 L167.3,33.5 L169.5,35.4 L171.7,37.5 L173.8,39.7 L176.0,42.0 L178.2,44.5 L180.3,47.1 L182.5,49.8 L184.7,52.6 L186.8,55.4 L189.0,58.2 L191.2,61.1 L193.3,64.0 L195.5,66.8 L197.7,69.7 L199.8,72.5 L202.0,75.3 L204.2,77.9 L206.3,80.6 L208.5,83.1 L210.7,85.6 L212.8,88.0 L215.0,90.2 L217.2,92.4 L219.3,94.4 L221.5,96.4 L223.7,98.2 L225.8,100.0 L228.0,101.6 L230.2,103.1 L232.3,104.5 L234.5,105.8 L236.7,107.1 L238.8,108.2 L241.0,109.2 L243.2,110.1 L245.3,111.0 L247.5,111.8 L249.7,112.5 L251.8,113.1 L254.0,113.7 L256.2,114.2 L258.3,114.7 L260.5,115.1 L262.7,115.5 L264.8,115.8 L267.0,116.1 L269.2,116.4 L271.3,116.6 L273.5,116.8 L275.7,117.0 L277.8,117.1 L280.0,117.2" fill="none" stroke="var(--purple)" stroke-width="2.5"/>
+<line x1="14" y1="118" x2="290" y2="118" stroke="var(--muted)" stroke-width="1.5"/>
+<line x1="150" y1="118" x2="150" y2="24" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="150" y="136" text-anchor="middle" class="ch-lbl ch-x">μ₀</text>
+<text x="250" y="68" text-anchor="middle" class="ch-lbl ch-x" fill="var(--pink)">α</text>
+</svg>
+    <div class="tail-name">one-tailed (right)</div>
+    <div class="tail-note">Критическая область — справа, вся площадь \(\alpha\)</div>
+  </div>
+  <div class="tail-card">
+    <div class="tail-head">\(H_1:\;\mu\neq\mu_0\)</div>
+    <svg viewBox="0 0 300 150" role="img" aria-label="Две критические области">
+<path d="M20.0,118 L20.0,117.2 L22.2,117.1 L24.3,117.0 L26.5,116.8 L28.7,116.6 L30.8,116.4 L33.0,116.1 L35.2,115.8 L37.3,115.5 L39.5,115.1 L41.7,114.7 L43.8,114.2 L46.0,113.7 L48.2,113.1 L50.3,112.5 L52.5,111.8 L54.7,111.0 L56.8,110.1 L59.0,109.2 L61.2,108.2 L63.3,107.1 L65.5,105.8 L67.7,104.5 L69.8,103.1 L72.0,101.6 L72.0,118 Z" fill="var(--pink)" opacity="0.75"/>
+<path d="M228.0,118 L228.0,101.6 L230.2,103.1 L232.3,104.5 L234.5,105.8 L236.7,107.1 L238.8,108.2 L241.0,109.2 L243.2,110.1 L245.3,111.0 L247.5,111.8 L249.7,112.5 L251.8,113.1 L254.0,113.7 L256.2,114.2 L258.3,114.7 L260.5,115.1 L262.7,115.5 L264.8,115.8 L267.0,116.1 L269.2,116.4 L271.3,116.6 L273.5,116.8 L275.7,117.0 L277.8,117.1 L280.0,117.2 L280.0,118 Z" fill="var(--pink)" opacity="0.75"/>
+<path d="M20.0,117.2 L22.2,117.1 L24.3,117.0 L26.5,116.8 L28.7,116.6 L30.8,116.4 L33.0,116.1 L35.2,115.8 L37.3,115.5 L39.5,115.1 L41.7,114.7 L43.8,114.2 L46.0,113.7 L48.2,113.1 L50.3,112.5 L52.5,111.8 L54.7,111.0 L56.8,110.1 L59.0,109.2 L61.2,108.2 L63.3,107.1 L65.5,105.8 L67.7,104.5 L69.8,103.1 L72.0,101.6 L74.2,100.0 L76.3,98.2 L78.5,96.4 L80.7,94.4 L82.8,92.4 L85.0,90.2 L87.2,88.0 L89.3,85.6 L91.5,83.1 L93.7,80.6 L95.8,77.9 L98.0,75.3 L100.2,72.5 L102.3,69.7 L104.5,66.8 L106.7,64.0 L108.8,61.1 L111.0,58.2 L113.2,55.4 L115.3,52.6 L117.5,49.8 L119.7,47.1 L121.8,44.5 L124.0,42.0 L126.2,39.7 L128.3,37.5 L130.5,35.4 L132.7,33.5 L134.8,31.8 L137.0,30.3 L139.2,29.0 L141.3,27.9 L143.5,27.1 L145.7,26.5 L147.8,26.1 L150.0,26.0 L152.2,26.1 L154.3,26.5 L156.5,27.1 L158.7,27.9 L160.8,29.0 L163.0,30.3 L165.2,31.8 L167.3,33.5 L169.5,35.4 L171.7,37.5 L173.8,39.7 L176.0,42.0 L178.2,44.5 L180.3,47.1 L182.5,49.8 L184.7,52.6 L186.8,55.4 L189.0,58.2 L191.2,61.1 L193.3,64.0 L195.5,66.8 L197.7,69.7 L199.8,72.5 L202.0,75.3 L204.2,77.9 L206.3,80.6 L208.5,83.1 L210.7,85.6 L212.8,88.0 L215.0,90.2 L217.2,92.4 L219.3,94.4 L221.5,96.4 L223.7,98.2 L225.8,100.0 L228.0,101.6 L230.2,103.1 L232.3,104.5 L234.5,105.8 L236.7,107.1 L238.8,108.2 L241.0,109.2 L243.2,110.1 L245.3,111.0 L247.5,111.8 L249.7,112.5 L251.8,113.1 L254.0,113.7 L256.2,114.2 L258.3,114.7 L260.5,115.1 L262.7,115.5 L264.8,115.8 L267.0,116.1 L269.2,116.4 L271.3,116.6 L273.5,116.8 L275.7,117.0 L277.8,117.1 L280.0,117.2" fill="none" stroke="var(--purple)" stroke-width="2.5"/>
+<line x1="14" y1="118" x2="290" y2="118" stroke="var(--muted)" stroke-width="1.5"/>
+<line x1="150" y1="118" x2="150" y2="24" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="150" y="136" text-anchor="middle" class="ch-lbl ch-x">μ₀</text>
+<text x="46" y="73" text-anchor="middle" class="ch-lbl ch-x" fill="var(--pink)">α/2</text>
+<text x="254" y="73" text-anchor="middle" class="ch-lbl ch-x" fill="var(--pink)">α/2</text>
+</svg>
+    <div class="tail-name">two-tailed</div>
+    <div class="tail-note">Два хвоста по \(\alpha/2\) каждый</div>
+  </div>
+</div>
+
+<div class="formula-mega">
+  <div class="formula-mega-head fmh-purple">
+    <div>
+      <div class="fm-title">Критическое значение: где α, а где α/2</div>
+      <div class="fm-sub">Через InvN или Invt, Tail: right</div>
+    </div>
+    <span class="fm-badge fm-b-purple">GDC</span>
+  </div>
+  <div class="formula-grid-body">
+    <div class="fg-cell">
+      <div class="fg-label">1-tailed</div>
+      <div class="fg-formula">\(\text{Area}=\alpha\)</div>
+      <div class="fg-note">\(\alpha=0{,}05\Rightarrow z_{\text{crit}}\approx1{,}645\)</div>
+    </div>
+    <div class="fg-cell">
+      <div class="fg-label">2-tailed</div>
+      <div class="fg-formula">\(\text{Area}=\dfrac{\alpha}{2}\)</div>
+      <div class="fg-note">\(\alpha=0{,}05\Rightarrow z_{\text{crit}}\approx1{,}96\)</div>
+    </div>
+  </div>
+</div>
+
+<div class="note-box nb-pink">
+  <div class="note-icon">🔍</div>
+  <div class="note-body">
+    <h4>Двусторонний тест «строже»</h4>
+    <p>При одной и той же выборке p-value двустороннего теста ровно <strong>вдвое больше</strong>: 0,0119 и 0,0239; 0,0177 и 0,0354; 0,0762 и 0,152. Поэтому бывает, что односторонний тест отвергает H₀, а двусторонний — уже нет.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §5 -->
+<div class="section-label" id="s5">§5 · Как писать вывод</div>
+<div class="two-col">
+  <div class="verdict-card ok">
+    <div class="verdict-tag">p-value &lt; α</div>
+    <h4>Отвергаем H₀</h4>
+    <p class="verdict-en">We reject H₀.</p>
+    <p>Дальше обязательно — <strong>фраза по смыслу задачи</strong>: «значит, \(\mu_1&gt;\mu_2\)», «значит, корреляция есть», «признаки зависимы».</p>
+  </div>
+  <div class="verdict-card no">
+    <div class="verdict-tag">p-value ≥ α</div>
+    <h4>Не отвергаем H₀</h4>
+    <p class="verdict-en">We do not have enough evidence to reject H₀.</p>
+    <p>Так и пишем. <strong>Не</strong> «мы доказали H₀» и <strong>не</strong> «H₀ верна».</p>
+  </div>
+</div>
+
+<div class="note-box nb-ink">
+  <div class="note-icon">🗝️</div>
+  <div class="note-body">
+    <h4>Почему нельзя сказать «принимаем H₀»</h4>
+    <p>Отсутствие доказательств против — не доказательство в пользу. Выборка просто оказалась недостаточно далеко от утверждения. Поэтому в IB за формулировку <em>«we accept H₀»</em> снимают баллы, а правильная фраза — <strong>«there is not enough evidence to reject H₀»</strong>.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §6 -->
+<div class="section-label" id="s6">§6 · Семь тестов на одной странице</div>
+<div class="tscroll">
+<table class="lookup-table">
+  <thead><tr><th>Что проверяем</th><th>H₀</th><th>Тест / GDC</th><th>Хвосты</th></tr></thead>
+  <tbody>
+    <tr><td>Два средних \(\mu_1,\mu_2\)</td><td>\(\mu_1=\mu_2\)</td><td class="highlighted">t-test, 2 samples (Pooled: ON)</td><td>1 или 2</td></tr>
+    <tr><td>Среднее \(\mu\), \(\sigma\) известна</td><td>\(\mu=\mu_0\)</td><td class="highlighted">Z-test, 1 sample</td><td>1 или 2</td></tr>
+    <tr><td>Среднее \(\mu\), \(\sigma\) неизвестна</td><td>\(\mu=\mu_0\)</td><td class="highlighted">t-test, 1 sample (вместо σ берём \(s_x\))</td><td>1 или 2</td></tr>
+    <tr><td>Независимость признаков</td><td>признаки независимы</td><td class="highlighted">χ² — 2WAY, \(\text{df}=(m-1)(n-1)\)</td><td>—</td></tr>
+    <tr><td>Согласие с распределением</td><td>данные следуют распределению</td><td class="highlighted">χ² — GOF, \(\text{df}=k-1\)</td><td>—</td></tr>
+    <tr><td>Доля \(p\)</td><td>\(p=p_0\)</td><td class="highlighted">Binomial \(B(n,p_0)\)</td><td>только 1</td></tr>
+    <tr><td>Корреляция \(\rho\)</td><td>\(\rho=0\)</td><td class="highlighted">t-test — REG</td><td>1 или 2</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="two-col">
+  <div class="note-box nb-pink">
+    <div class="note-icon">🔗</div>
+    <div class="note-body">
+      <h4>Paired vs unpaired</h4>
+      <p><strong>Unpaired</strong> — две разные выборки, берём 2-sample t-test. <strong>Paired</strong> — одни и те же объекты в два момента времени: сначала считаем <strong>разности</strong> \(x_i-y_i\) и работаем с ними как с одной выборкой. Тогда \(\mu=0\) — «не изменилось», \(\mu&gt;0\) — «выросло».</p>
+    </div>
+  </div>
+  <div class="note-box nb-pink">
+    <div class="note-icon">📊</div>
+    <div class="note-body">
+      <h4>Про χ²-тесты</h4>
+      <p>У них нет «хвостов»: критическая область всегда справа. Если какая-то ожидаемая частота \(\le5\) — категории <strong>объединяют</strong>, и df уменьшается.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §7 -->
+<div class="section-label" id="s7">§7 · Ошибки I и II рода</div>
+<div class="err-matrix">
+  <div class="em-h corner"></div>
+  <div class="em-h">H₀ на самом деле&nbsp;<strong>верна</strong></div>
+  <div class="em-h">H₀ на самом деле&nbsp;<strong>ложна</strong></div>
+
+  <div class="em-h rh">Мы отвергли H₀</div>
+  <div class="em-cell bad"><div class="em-title">Type I error</div><div class="em-sub">Вероятность = α</div></div>
+  <div class="em-cell good"><div class="em-title">Верное решение</div><div class="em-sub">✓</div></div>
+
+  <div class="em-h rh">Мы не отвергли H₀</div>
+  <div class="em-cell good"><div class="em-title">Верное решение</div><div class="em-sub">✓</div></div>
+  <div class="em-cell bad"><div class="em-title">Type II error</div><div class="em-sub">Считается по новому \(\mu_1\)</div></div>
+</div>
+
+<div class="formula-mega">
+  <div class="formula-mega-head fmh-purple">
+    <div>
+      <div class="fm-title">Как их считают</div>
+      <div class="fm-sub">Сначала находим критическую и некритическую область</div>
+    </div>
+    <span class="fm-badge fm-b-purple">Методика</span>
+  </div>
+  <div class="formula-grid-body">
+    <div class="fg-cell">
+      <div class="fg-label">Type I error</div>
+      <div class="fg-formula">\(P(\text{critical region})\) при \(\mu_0\)</div>
+      <div class="fg-note">Берём \(N\!\left(\mu_0,\frac{\sigma^2}{n}\right)\), \(\text{Po}(\lambda_0)\) или \(B(n,p_0)\). Для нормального это ровно α</div>
+    </div>
+    <div class="fg-cell">
+      <div class="fg-label">Type II error</div>
+      <div class="fg-formula">\(P(\text{non-critical region})\) при \(\mu_1\)</div>
+      <div class="fg-note">Даётся новое истинное значение \(\mu_1\), \(\lambda_1\) или \(p_1\)</div>
+    </div>
+  </div>
+</div>
+
+<div class="note-box nb-ink">
+  <div class="note-icon">⚖️</div>
+  <div class="note-body">
+    <h4>Критическая область не зависит от выборки</h4>
+    <p>Она определяется <strong>только уровнем α</strong> и видом H₁: \(X&lt;r\), \(X&gt;r\) или \(X&lt;r\) и \(X&gt;s\). Для Пуассона и биномиального распределения значения целые, поэтому реальная вероятность критической области чуть <strong>меньше</strong> α, а не равна ей.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- §8 -->
+<div class="section-label" id="s8">§8 · Разобранные примеры</div>
+
+<div class="worked-header">
+  <div><h2>Пример 1 — два средних</h2><p>Выборка A: \(\bar{x}_1=70{,}1\) · выборка B: \(\bar{x}_2=63{,}1\) · α = 0,05</p></div>
+  <div class="worked-badge">2-sample t-test</div>
+</div>
+<div class="parts-grid">
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-pink">a</span><span class="part-q">Энн: \(\mu_1&gt;\mu_2\) (one-tailed)</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">гипотезы</span><span class="step-text">\(H_0:\mu_1=\mu_2\), \(H_1:\mu_1&gt;\mu_2\)</span></div>
+      <div class="step"><span class="step-tag">GDC</span><span class="step-text">p-value = 0,041 &lt; 0,05</span></div>
+      <div class="ans-row ans-pink"><span class="ans-label">Вывод</span><span>отвергаем H₀, Энн права</span></div>
+    </div>
+  </div>
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-purple">b</span><span class="part-q">Билл: \(\mu_1\neq\mu_2\) (two-tailed)</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">гипотезы</span><span class="step-text">\(H_0:\mu_1=\mu_2\), \(H_1:\mu_1\neq\mu_2\)</span></div>
+      <div class="step"><span class="step-tag">GDC</span><span class="step-text">p-value = 0,082 &gt; 0,05</span></div>
+      <div class="ans-row ans-purple"><span class="ans-label">Вывод</span><span>не хватает доказательств отвергнуть H₀</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="worked-header">
+  <div><h2>Пример 2 — среднее при известной σ</h2><p>\(n=40\), \(\bar{x}=23\), \(\sigma=2{,}8\), утверждение \(\mu=24\), α = 0,05</p></div>
+  <div class="worked-badge">Z-test, 1 sample</div>
+</div>
+<div class="parts-grid three">
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-pink">a</span><span class="part-q">Two-tailed</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">H₁</span><span class="step-text">\(\mu\neq24\)</span></div>
+      <div class="step"><span class="step-tag">p</span><span class="step-text">0,0239 &lt; 0,05</span></div>
+      <div class="ans-row ans-pink"><span class="ans-label">Вывод</span><span>отвергаем H₀: \(\mu\neq24\)</span></div>
+    </div>
+  </div>
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-purple">b</span><span class="part-q">One-tailed</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">H₁</span><span class="step-text">\(\mu&lt;24\)</span></div>
+      <div class="step"><span class="step-tag">p</span><span class="step-text">0,0119 — ровно вдвое меньше</span></div>
+      <div class="ans-row ans-purple"><span class="ans-label">Вывод</span><span>отвергаем H₀: \(\mu&lt;24\)</span></div>
+    </div>
+  </div>
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-pink">c</span><span class="part-q">Через статистику</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">статистика</span><span class="step-text">\(z=-2{,}26\Rightarrow|z|=2{,}26\)</span></div>
+      <div class="step"><span class="step-tag">сравнение</span><span class="step-text">2-tailed: \(2{,}26&gt;1{,}96\) · 1-tailed: \(2{,}26&gt;1{,}645\)</span></div>
+      <div class="ans-row ans-pink"><span class="ans-label">Вывод</span><span>тот же — отвергаем H₀</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="note-box nb-pink">
+  <div class="note-icon">✏️</div>
+  <div class="note-body">
+    <h4>Проверьте конспект</h4>
+    <p>В разделе 4.22 критические значения в пунктах (a) и (b) переставлены местами: для <strong>двустороннего</strong> теста при α = 0,05 нужно \(z_{\text{crit}}=1{,}96\), а для <strong>одностороннего</strong> — \(1{,}645\). В таблице выше они стоят правильно. Вывод в обоих случаях не меняется, потому что \(2{,}26\) больше обоих чисел.</p>
+  </div>
+</div>
+
+<div class="worked-header">
+  <div><h2>Пример 3 — σ неизвестна</h2><p>\(n=20\), \(\bar{x}=23\), \(s_{n-1}=3\), утверждение \(\mu=24\), α = 0,05</p></div>
+  <div class="worked-badge">t-test, 1 sample</div>
+</div>
+<div class="parts-grid">
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-pink">a</span><span class="part-q">Почему t, а не Z</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">правило</span><span class="step-text">σ популяции не дана → берём \(s_x\) и t-тест</span></div>
+      <div class="ans-row ans-pink"><span class="ans-label">Статистика</span><span>\(t=-1{,}49\)</span></div>
+    </div>
+  </div>
+  <div class="part-card">
+    <div class="part-head"><span class="part-letter pl-purple">b</span><span class="part-q">Оба теста</span></div>
+    <div class="part-body">
+      <div class="step"><span class="step-tag">two-tailed</span><span class="step-text">p = 0,152 &gt; 0,05</span></div>
+      <div class="step"><span class="step-tag">one-tailed</span><span class="step-text">p = 0,0762 &gt; 0,05</span></div>
+      <div class="ans-row ans-purple"><span class="ans-label">Вывод</span><span>в обоих случаях не отвергаем H₀</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label">Частые ошибки</div>
+<div class="two-col">
+  <div class="mis"><span class="pill warn">вывод</span><div class="bad">✗ «Мы приняли H₀ — значит, она верна»</div><div class="good">✓ «Не хватает доказательств, чтобы отвергнуть H₀»</div></div>
+  <div class="mis"><span class="pill warn">хвосты</span><div class="bad">✗ Для \(\mu\neq\mu_0\) взять \(z_{\text{crit}}\) по площади α</div><div class="good">✓ Для двустороннего — площадь α/2</div></div>
+  <div class="mis"><span class="pill warn">сравнение</span><div class="bad">✗ Сравнить p-value с критическим значением</div><div class="good">✓ p-value ↔ α, статистика ↔ критическое значение</div></div>
+  <div class="mis"><span class="pill warn">знак</span><div class="bad">✗ Забыть модуль: \(-2{,}26&lt;1{,}96\)</div><div class="good">✓ Сравниваем \(|z|\): \(2{,}26&gt;1{,}96\)</div></div>
+  <div class="mis"><span class="pill warn">H₀</span><div class="bad">✗ Записать \(H_0:\mu&gt;24\)</div><div class="good">✓ В H₀ всегда равенство, неравенство — в H₁</div></div>
+  <div class="mis"><span class="pill warn">σ</span><div class="bad">✗ Брать Z-тест, когда дана только \(s_{n-1}\)</div><div class="good">✓ Нет σ популяции → t-тест</div></div>
+</div>
+
+<div class="section-label">Алгоритм для любой задачи</div>
+<div class="criteria-list">
+  <div class="criteria-item"><div class="criteria-num">1</div><span><strong>Выпиши H₀ и H₁.</strong> В H₀ — равенство; по знаку H₁ определи число хвостов.</span></div>
+  <div class="criteria-item"><div class="criteria-num">2</div><span><strong>Найди α в условии</strong> и выбери тест по таблице §6.</span></div>
+  <div class="criteria-item"><div class="criteria-num">3</div><span><strong>Введи данные в GDC</strong> и получи p-value (и статистику).</span></div>
+  <div class="criteria-item"><div class="criteria-num">4</div><span><strong>Сравни:</strong> \(p&lt;\alpha\) или \(|{\text{статистика}}|&gt;{\text{критическое}}\).</span></div>
+  <div class="criteria-item"><div class="criteria-num">5</div><span><strong>Напиши вывод двумя предложениями:</strong> про H₀ и про смысл задачи.</span></div>
+</div>
+
+<div class="section-label">Коротко — всё главное</div>
+<div class="facts-box">
+  <div class="facts-title">Key Facts: hypothesis testing</div>
+  <div class="fact-row">📌 H₀ — всегда равенство; H₁ задаёт один или два хвоста</div>
+  <div class="fact-row">📌 α — уровень значимости, дан в условии; это вероятность ошибки I рода</div>
+  <div class="fact-row">📌 Решающее правило: \(p\text{-value}&lt;\alpha\Rightarrow\) отвергаем H₀</div>
+  <div class="fact-row">📌 Или: \(|z|&gt;z_{\text{crit}}\) · \(|t|&gt;t_{\text{crit}}\) · \(\chi^2&gt;\chi^2_{\text{crit}}\)</div>
+  <div class="fact-row">📌 One-tailed: Area = α · two-tailed: Area = α/2; p-value двустороннего вдвое больше</div>
+  <div class="fact-row">📌 Type I — отвергли верную H₀ (вероятность α); Type II — не отвергли ложную</div>
+  <div class="fact-row">📌 df: для таблицы \((m-1)(n-1)\), для GOF \(k-1\)</div>
+  <div class="fact-row">📌 Если H₀ не отвергнута — пишем «not enough evidence to reject», а не «accept»</div>
+</div>
+
+<footer class="footer">
+  <span>Статистика · Inferential statistics · Topic 4B</span>
+  <span>\(p&lt;\alpha\Rightarrow\) reject \(H_0\)</span>
+</footer>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],
+    throwOnError: false
+  });
+});
+</script>
+</body>
+</html>
